@@ -2,8 +2,8 @@
 
 
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 
 # 初始化flask应用
