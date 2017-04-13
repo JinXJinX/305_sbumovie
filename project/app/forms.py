@@ -4,12 +4,10 @@ from flask_wtf import Form
 from wtforms import TextField, BooleanField, SubmitField, TextAreaField, RadioField, IntegerField, DecimalField
 from wtforms.validators import Required, Email, Length, NumberRange, URL
 
-
 class LoginForm(Form):
     user_name = TextField('user name', validators=[
         Required(), Length(max=20)])
     submit = SubmitField('Log in')
-
 
 class SignUpForm(Form):
     user_name = TextField('user name', validators=[

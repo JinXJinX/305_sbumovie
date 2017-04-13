@@ -1,6 +1,4 @@
 # -*- coding:utf-8 -*-
-
-
 import datetime
 import sys
 #from string import strip
@@ -17,12 +15,10 @@ from .utils import PER_PAGE
 
 from app import app, db, lm
 
-
 @lm.user_loader
 def load_user(user_id):
     #return User.query.get(int(user_id))
-    return User.query.get(user_id)
-
+    return Account.query.get(user_id)
 
 @app.route('/')
 @app.route('/index')
