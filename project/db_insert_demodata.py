@@ -1,12 +1,6 @@
 from app import db
-
 from app.models import Person, Location, Movie, Employee, Accounts, Customer, Orders, Actor, Rental, MovieQ, MovieF, AppearedIn, Reviews
 from datetime import datetime
-from sqlalchemy import create_engine, Table, MetaData, UniqueConstraint
-from sqlalchemy.orm import create_session
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, Text, ForeignKey
-from sqlalchemy.orm import sessionmaker, relationship
 from faker import Factory
 
 num = 200
