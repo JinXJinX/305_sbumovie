@@ -4,16 +4,16 @@ USE CSE305;
 
 CREATE TABLE Location (
   ZipCode INTEGER,
-  City CHAR(20) NOT NULL,
-  State CHAR(20) NOT NULL,
+  City VARCHAR(50) NOT NULL,
+  State VARCHAR(50) NOT NULL,
   PRIMARY KEY (ZipCode)
 );
 
 CREATE TABLE Person (
   SSN INTEGER,
-  LastName CHAR(20) NOT NULL,
-  FirstName CHAR(20) NOT NULL,
-  Address CHAR(20),
+  LastName VARCHAR(50) NOT NULL,
+  FirstName VARCHAR(50) NOT NULL,
+  Address VARCHAR(200),
   ZipCode INTEGER,
   Telephone INTEGER,
   PRIMARY KEY (SSN),
@@ -36,7 +36,7 @@ CREATE TABLE Employee (
 CREATE TABLE Accounts (
   Id INTEGER AUTO_INCREMENT,
   DateOpened DATE,
-  Type CHAR(10) CHECK ( VALUE IN (‘Limited’, ‘Unlimited-1’, ‘Unlimited-2’, ‘Unlimited-3’, ‘Admin’, ‘CustRep) ),
+  Type VARCHAR(20) CHECK ( VALUE IN (‘Limited’, ‘Unlimited-1’, ‘Unlimited-2’, ‘Unlimited-3’, ‘Admin’, ‘CustRep’) ),
   Customer INTEGER ,
   UserName CHAR(20),
   PassWord CHAR(20),
@@ -45,9 +45,9 @@ CREATE TABLE Accounts (
 
 CREATE TABLE Customer (
   Id INTEGER AUTO_INCREMENT CHECK (CustomerId > 0 AND CustomerId < 1000000000),
-  Email CHAR(32),
+  Email VARCHAR(60),
   Rating INTEGER,
-  CreditCardNumber INTEGER,
+  CreditCardNumber VARCHAR(30),
   PRIMARY KEY (Id),
   FOREIGN KEY (Id) REFERENCES Person (SSN)
     ON DELETE NO ACTION
@@ -56,35 +56,35 @@ CREATE TABLE Customer (
 
 CREATE TABLE Orders (
   Id INTEGER AUTO_INCREMENT,
-  DateTime DATETIME,
-  ReturnDate DATE,
+  OrderDate DATETIME,
+  ReturnDate DATETIME,
   PRIMARY KEY (Id)
 );
 
 CREATE TABLE Movie (
   Id INTEGER AUTO_INCREMENT,
-  Name CHAR(20) NOT NULL,
+  Name VARCHAR(100) NOT NULL,
   Type CHAR(20) NOT NULL,
   Rating DECIMAL(3,1),
   NumRating INTEGER,
-  DistrFee DECIMAL(7,2), 
+  DistrFee DECIMAL(7,2),
   NumCopies INTEGER,
   ImageUrl CHAR(100),
   Synopsis VARCHAR(2000),
-  ImdbID CHAR(20),
+  ImdbId CHAR(20),
   PRIMARY KEY (Id)
 );
 
 CREATE TABLE Actor (
   Id INTEGER AUTO_INCREMENT,
-  Name CHAR(20) NOT NULL,
+  Name VARCHAR(50) NOT NULL,
   Age INTEGER NOT NULL,
   Gender CHAR(1) NOT NULL,
   Rating DECIMAL(3,1),
   NumRating INTEGER,
   ImageUrl CHAR(100),
   Biography VARCHAR(2000),
-  ImdbID CHAR(20),
+  ImdbId CHAR(20),
   PRIMARY KEY (Id)
 );
 
