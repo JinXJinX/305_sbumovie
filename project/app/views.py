@@ -9,8 +9,7 @@ from flask_login import (
     login_user, logout_user, current_user, login_required)
 from .forms import (
     LoginForm, SignUpForm, PublishBlogForm, AboutMeForm, PublishMovieForm)
-from .models import (
-    User, Post, Movie, Queue, ROLE_USER, ROLE_ADMIN)
+from .models import ( Person )
 from .utils import PER_PAGE
 
 from app import app, db, lm

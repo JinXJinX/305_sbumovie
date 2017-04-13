@@ -2,6 +2,13 @@ DROP DATABASE IF EXISTS CSE305;
 CREATE DATABASE CSE305;
 USE CSE305;
 
+CREATE TABLE Location (
+  ZipCode INTEGER,
+  City CHAR(20) NOT NULL,
+  State CHAR(20) NOT NULL,
+  PRIMARY KEY (ZipCode)
+);
+
 CREATE TABLE Person (
   SSN INTEGER,
   LastName CHAR(20) NOT NULL,
@@ -13,41 +20,31 @@ CREATE TABLE Person (
   FOREIGN KEY (ZipCode) REFERENCES Location (ZipCode)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
-
-CREATE TABLE Location (
-  ZipCode INTEGER,
-  City CHAR(20) NOT NULL,
-  State CHAR(20) NOT NULL,
-  PRIMARY KEY (ZipCode)
-)
+);
 
 CREATE TABLE Employee (
-  ID EmpId AUTO_INCREMENT,
+  Id INTEGER AUTO_INCREMENT CHECK (EmpId > 0 AND EmpId < 1000000000),
   SSN INTEGER,
   StartDate DATE,
   HourlyRate INTEGER,
   PRIMARY KEY (ID),
-  FOREIGN KEY (SSN) REFERENCES Person (SSN))
+  FOREIGN KEY (SSN) REFERENCES Person (SSN)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
-CREATE TABLE Account (
+CREATE TABLE Accounts (
   Id INTEGER AUTO_INCREMENT,
   DateOpened DATE,
-  Type AccountType,
-  Customer CustomerId,
+  Type CHAR(10) CHECK ( VALUE IN (‘Limited’, ‘Unlimited-1’, ‘Unlimited-2’, ‘Unlimited-3’, ‘Admin’, ‘CustRep) ),
+  Customer INTEGER ,
   UserName CHAR(20),
   PassWord CHAR(20),
-  PRIMARY KEY (Id),
-  FOREIGN KEY (Customer) REFERENCES Customer (Id)
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE
-)
+  PRIMARY KEY (Id)
+);
 
 CREATE TABLE Customer (
-  Id CustomerId AUTO_INCREMENT,
+  Id INTEGER AUTO_INCREMENT CHECK (CustomerId > 0 AND CustomerId < 1000000000),
   Email CHAR(32),
   Rating INTEGER,
   CreditCardNumber INTEGER,
@@ -55,14 +52,14 @@ CREATE TABLE Customer (
   FOREIGN KEY (Id) REFERENCES Person (SSN)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
-CREATE TABLE Order (
+CREATE TABLE Orders (
   Id INTEGER AUTO_INCREMENT,
   DateTime DATETIME,
   ReturnDate DATE,
   PRIMARY KEY (Id)
-)
+);
 
 CREATE TABLE Movie (
   Id INTEGER AUTO_INCREMENT,
@@ -70,83 +67,74 @@ CREATE TABLE Movie (
   Type CHAR(20) NOT NULL,
   Rating DECIMAL(3,1),
   NumRating INTEGER,
-  DistrFee CURRENCY,
+  DistrFee DECIMAL(7,2), 
   NumCopies INTEGER,
   ImageUrl CHAR(100),
-  Synopsis CHAR(2000),
+  Synopsis VARCHAR(2000),
   ImdbID CHAR(20),
   PRIMARY KEY (Id)
-)
+);
 
 CREATE TABLE Actor (
   Id INTEGER AUTO_INCREMENT,
   Name CHAR(20) NOT NULL,
   Age INTEGER NOT NULL,
-  M/F CHAR(1) NOT NULL,
+  Gender CHAR(1) NOT NULL,
   Rating DECIMAL(3,1),
   NumRating INTEGER,
   ImageUrl CHAR(100),
-  Biography CHAR(2000),
+  Biography VARCHAR(2000),
   ImdbID CHAR(20),
   PRIMARY KEY (Id)
-)
-
-CREATE DOMAIN AccountType CHAR(20)
-  CHECK ( VALUE IN (‘Limited’, ‘Unlimited-1’, ‘Unlimited-2’, ‘Unlimited-3’, ‘Admin’, ‘CustRep) )
-
-CREATE DOMAIN EmpId INTEGER
-  CHECK (EmpId > 0 AND EmpId < 1000000000)
-
-CREATE DOMAIN CustomerId INTEGER
-  CHECK (CustomerId > 0 AND CustomerId < 1000000000)
+);
 
 CREATE TABLE Rental (
   AccountId INTEGER,
-  CustRepId EmpId,
+  CustRepId INTEGER,
   OrderId INTEGER,
-  MovieId CHAR(20),
+  MovieId INTEGER,
   PRIMARY KEY (AccountId, CustRepId, OrderId, MovieId),
-  FOREIGN KEY (AccountId) REFERENCES Account (Id)
+  FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (CustRepId) REFERENCES Employee (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
-  FOREIGN KEY (OrderId) REFERENCES Order (Id)
+  FOREIGN KEY (OrderId) REFERENCES Orders (Id)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE MovieQ (
   AccountId INTEGER,
   MovieId INTEGER,
   PRIMARY KEY (AccountId, MovieId),
-  FOREIGN KEY (AccountId) REFERENCES Account (Id)
+  FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE MovieF (
   AccountId INTEGER,
-  MovieId CHAR(20),
+  MovieId INTEGER,
   PRIMARY KEY (AccountId, MovieId),
-  FOREIGN KEY (AccountId) REFERENCES Account (Id)
+  FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE AppearedIn (
   ActorId INTEGER,
-  MovieId CHAR(20),
+  MovieId INTEGER,
   PRIMARY KEY (ActorId, MovieId),
   FOREIGN KEY (ActorId) REFERENCES Actor (Id)
     ON DELETE NO ACTION
@@ -154,17 +142,18 @@ CREATE TABLE AppearedIn (
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);
 
-CREATE TABLE Review (
+CREATE TABLE Reviews (
   ReviewId INTEGER AUTO_INCREMENT,
   AccountId INTEGER,
   MovieId INTEGER,
-  Content CHAR(10000),
+  Content VARCHAR(10000),
   PRIMARY KEY (ReviewId),
-  FOREIGN KEY (AccountId) REFERENCES Account (Id)
+  FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE,
+    ON UPDATE CASCADE
+)
