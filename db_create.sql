@@ -9,67 +9,50 @@ CREATE TABLE Location (
   PRIMARY KEY (ZipCode)
 );
 
-CREATE TABLE Person (
-  SSN INTEGER,
-  LastName VARCHAR(50) NOT NULL,
-  FirstName VARCHAR(50) NOT NULL,
+CREATE TABLE Accounts (
+  Id INTEGER AUTO_INCREMENT,
+  DateOpened DATE,
+  Type VARCHAR(20) CHECK ( VALUE IN ("Limited", "Unlimited-1", "Unlimited-2", "Unlimited-3", "Admin", "CustRep") ),
+  UserName CHAR(20),
+  PassWord CHAR(20) NOT NULL,
+  LastName VARCHAR(50),
+  FirstName VARCHAR(50),
   Address VARCHAR(200),
   ZipCode INTEGER,
-  Telephone INTEGER,
-  PRIMARY KEY (SSN),
+  Phone INTEGER,
+  Email VARCHAR(60) NOT NULL,
+  Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
+  CreditCardNumber VARCHAR(30),
+  PRIMARY KEY (Id),
+  UNIQUE (Email),
   FOREIGN KEY (ZipCode) REFERENCES Location (ZipCode)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
 
 CREATE TABLE Employee (
-  Id INTEGER AUTO_INCREMENT CHECK (EmpId > 0 AND EmpId < 1000000000),
-  SSN INTEGER,
-  StartDate DATE,
+  Id INTEGER AUTO_INCREMENT CHECK (Id > 0 AND Id < 1000000000),
+  SSN INTEGER NOT NULL,
+  StartDate DATETIME,
   HourlyRate INTEGER,
-  PRIMARY KEY (ID),
-  FOREIGN KEY (SSN) REFERENCES Person (SSN)
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE
-);
-
-CREATE TABLE Accounts (
-  Id INTEGER AUTO_INCREMENT,
-  DateOpened DATE,
-  Type VARCHAR(20) CHECK ( VALUE IN (‘Limited’, ‘Unlimited-1’, ‘Unlimited-2’, ‘Unlimited-3’, ‘Admin’, ‘CustRep’) ),
-  Customer INTEGER ,
-  UserName CHAR(20),
-  PassWord CHAR(20),
-  PRIMARY KEY (Id)
-);
-
-CREATE TABLE Customer (
-  Id INTEGER AUTO_INCREMENT CHECK (CustomerId > 0 AND CustomerId < 1000000000),
-  Email VARCHAR(60),
-  Rating INTEGER,
-  CreditCardNumber VARCHAR(30),
+  AccountId INTEGER,
   PRIMARY KEY (Id),
-  FOREIGN KEY (Id) REFERENCES Person (SSN)
+  UNIQUE (SSN),
+  FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-);
-
-CREATE TABLE Orders (
-  Id INTEGER AUTO_INCREMENT,
-  OrderDate DATETIME,
-  ReturnDate DATETIME,
-  PRIMARY KEY (Id)
 );
 
 CREATE TABLE Movie (
   Id INTEGER AUTO_INCREMENT,
   Name VARCHAR(100) NOT NULL,
   Type CHAR(20) NOT NULL,
-  Rating DECIMAL(3,1),
+  Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
   NumRating INTEGER,
   DistrFee DECIMAL(7,2),
   NumCopies INTEGER,
   ImageUrl CHAR(100),
+  TrailerUrl CHAR(100),
   Synopsis VARCHAR(2000),
   ImdbId CHAR(20),
   PRIMARY KEY (Id)
@@ -80,7 +63,7 @@ CREATE TABLE Actor (
   Name VARCHAR(50) NOT NULL,
   Age INTEGER NOT NULL,
   Gender CHAR(1) NOT NULL,
-  Rating DECIMAL(3,1),
+  Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
   NumRating INTEGER,
   ImageUrl CHAR(100),
   Biography VARCHAR(2000),
@@ -88,19 +71,19 @@ CREATE TABLE Actor (
   PRIMARY KEY (Id)
 );
 
-CREATE TABLE Rental (
+CREATE TABLE Orders (
+  Id INTEGER AUTO_INCREMENT,
+  OrderDate DATETIME,
+  ReturnDate DATETIME,
   AccountId INTEGER,
   CustRepId INTEGER,
-  OrderId INTEGER,
   MovieId INTEGER,
-  PRIMARY KEY (AccountId, CustRepId, OrderId, MovieId),
+  Price DECIMAL(7,2),
+  PRIMARY KEY (Id),
   FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (CustRepId) REFERENCES Employee (Id)
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE,
-  FOREIGN KEY (OrderId) REFERENCES Orders (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
@@ -145,11 +128,12 @@ CREATE TABLE AppearedIn (
 );
 
 CREATE TABLE Reviews (
-  ReviewId INTEGER AUTO_INCREMENT,
+  Id INTEGER AUTO_INCREMENT,
   AccountId INTEGER,
   MovieId INTEGER,
+  Title VARCHAR(200),
   Content VARCHAR(10000),
-  PRIMARY KEY (ReviewId),
+  PRIMARY KEY (Id),
   FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,

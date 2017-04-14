@@ -2,64 +2,68 @@
 import datetime
 import sys
 #from string import strip
-
 from flask import (
     render_template, flash, redirect, session, url_for, request, g)
 from flask_login import (
     login_user, logout_user, current_user, login_required)
 from .forms import (
     LoginForm, SignUpForm, PublishBlogForm, AboutMeForm, PublishMovieForm)
-from .models import ( Person )
+from .models import *
 from .utils import PER_PAGE
-
+from .data import *
 from app import app, db, lm
+
+def redirect_back(endpoint, **values):
+    target = request.form['next']
+    if not target or not is_safe_url(target):
+        target = url_for(endpoint, **values)
+    return redirect(target)
 
 @lm.user_loader
 def load_user(user_id):
     #return User.query.get(int(user_id))
-    return Account.query.get(user_id)
+    return Accounts.query.get(user_id)
 
 @app.route('/')
 @app.route('/index')
 def index():
-    movies = Movie.query.order_by(
-        db.desc(Movie.id)
-    )
+    movies = getMovies()
+    hotMovies = getHotMovies()
+    res = getHotReviews()
     return render_template(
         "index.html",
         title="Home",
-        movies=movies)
+        movies=movies,
+        hotMovies=hotMovies,
+        res=res)
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
     if current_user.is_authenticated:
         return redirect('index')
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.login_check(request.form.get('user_name'))
+        user = Accounts.login_check(request.form.get('user_email'),
+                                request.form.get('user_password'))
 
         if user:
             login_user(user)
-            user.last_seen = datetime.datetime.now()
-
             try:
                 db.session.add(user)
                 db.session.commit()
             except:
                 flash("The Database error!")
-                return redirect('/login')
+                return redirect('/sign_in')
 
-            flash('Your name: ' + request.form.get('user_name'))
-            flash('remember me? ' + str(request.form.get('remember_me')))
-            return redirect(url_for("users", user_id=current_user.id))
+            flash('Your name: ' + request.form.get('user_email'))
+            return redirect('index')
         else:
             flash('Login failed, Your name is not exist!')
-            return redirect('/login')
+            return redirect('/sign_in')
 
     return render_template(
-        "login.html",
+        "sign_in.html",
         title="Sign In",
         form=form)
 
@@ -70,149 +74,119 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/sign-up', methods=['GET', 'POST'])
+@app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     form = SignUpForm()
-    user = User()
+    account = Accounts()
     if form.validate_on_submit():
-        user_name = request.form.get('user_name')
-        user_email = request.form.get('user_email')
-        user_type = request.form.get('account_type')
+        account.UserName = request.form.get('user_name')
+        account.PassWord = request.form.get('user_password')
+        account.Type = request.form.get('account_type')
+        account.Email = request.form.get('user_email')
+        account.CreditCardNumber = request.form.get('credit_card')
+        account.Last_name = request.form.get('last_name')
+        account.First_name = request.form.get('first_name')
+        account.Address = request.form.get('address')
+        account.Zipcode = request.form.get('zipcode')
+        account.Phone = request.form.get('phone')
 
-        register_check = User.query.filter(db.or_(
-            User.customer_id == user_name, User.email == user_email)).first()
+        register_check = Accounts.login_check(account.UserName, account.PassWord)
         if register_check:
             flash("error: The user's name or email already exists!")
-            return redirect('/sign-up')
+            return redirect('/sign_up')
 
-        if len(user_name) and len(user_email):
-            user.customer_id = user_name
-            user.email = user_email
-            user.type = user_type
-            user.creation_data = datetime.datetime.now()
-            '''
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                flash("The Database error!")
-                return redirect('/sign-up')
-            '''
+        try:
+            db.session.add(account)
+            db.session.commit()
+        except:
+            flash("Database error!")
+            print("Unexpected error:", sys.exc_info()[0])
+            return redirect('/sign_up')
 
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                flash("Database error!")
-                return redirect('/sign-up')
-
-            flash("Sign up successful!")
-            return redirect('/index')
+        login_user(account)
+        flash("Sign up successful!")
+        return redirect('/index')
 
     return render_template(
         "sign_up.html",
         form=form)
 
+@app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
+def movie(movie_id = None):
+    movie = getMovieById(movie_id)
+    return render_template(
+        "movie.html",
+        title="Home",
+        movie=movie)
 
 @app.route('/profile', methods=['GET', 'POST'])
-@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
+#@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
 @login_required
-def profile(user_id = None):
+def profile():
     form = SignUpForm()
-    form.submit.type = 'SAVE'
-    user = User.query.filter_by(
-        id = current_user.id
-        ).first()
+    form.submit.data = 'SAVE'
+    session = db.session()
+    if current_user.is_authenticated():
+        user_id = current_user.get_id()
+
+    #account = getAccount(user_id)
+    account = session.query(Accounts).filter_by(Id=user_id).first()
 
     if form.validate_on_submit():
-        user_name = request.form.get('user_name').strip()
-        user_email = request.form.get('user_email').strip()
-        user_type = request.form.get('account_type')
-
-        last_name = request.form.get('last_name').strip()
-        first_name= request.form.get('first_name').strip()
-        address = request.form.get('address').strip()
-        city = request.form.get('city').strip().upper()
-        state = request.form.get('state').strip().upper()
-        zipcode = request.form.get('zipcode').strip()
-        phone = request.form.get('phone').strip()
-
-
-        register_check = User.query.filter(db.and_(
-            User.id != user.id, User.customer_id == user_name)).first()
-
-        if register_check:
-            flash("error: The user's name or email already exists!")
-            return redirect(url_for("profile", user_id=user_id))
-
-        if len(user_name) and len(user_email):
-            user.customer_id = user_name
-            user.email = user_email
-            user.type = user_type
-
-            user.last_name = last_name if len(last_name) else None
-            user.first_name = first_name if len(first_name) else None
-            user.address = address if len(address) else None
-            user.city = city if len(city) else None
-            user.state = state if len(state) else None
-            user.zipcode = zipcode if len(zipcode) else None
-            user.phone = phone if len(phone) else None
-
-            '''
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                flash("The Database error!")
-                return redirect('/sign-up')
-            '''
-
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                print('db err')
-                flash("Database error!")
-                return redirect(url_for("profile", user_id=user_id))
-            print('return pro')
-            flash("Sign up successful!")
-            return redirect(url_for("profile", user_id=user_id))
-
-    else:
-        form.user_name.data = user.customer_id
-        form.user_email.data = user.email
-        form.account_type.data = user.type.name
-        form.last_name.data = user.last_name
-        form.first_name.data = user.first_name
-        form.address.data = user.address
-        form.city.data = user.city
-        form.state.data = user.state
-        form.zipcode.data = user.zipcode
-        form.phone.data = user.phone
+        account = session.query(Accounts).filter_by(Id=user_id).first()
+        account.Customer = request.form.get('user_ssn')
+        account.UserName = request.form.get('user_name')
+        account.PassWord = request.form.get('user_password')
+        account.Type = request.form.get('account_type')
+        account.Email = request.form.get('user_email')
+        account.CreditCardNumber = request.form.get('credit_card')
+        account.Last_name = request.form.get('last_name')
+        account.First_name = request.form.get('first_name')
+        account.Address = request.form.get('address')
+        account.Zipcode = request.form.get('zipcode')
+        account.Phone = request.form.get('phone')
+        try:
+            db.session.commit()
+        except:
+            print('db err')
+            flash("Database error!")
+            render_template(
+                "profile.html",
+                form=form)
+        print('return pro')
+        flash("Sign up successful!")
         return render_template(
             "profile.html",
-            user_id=user_id,
             form=form)
+    else:
+        print (form.errors)
+        form.user_name.data = account.UserName
+        form.user_password.data = account.PassWord
+        form.account_type.data = account.Type
+        form.last_name.data = account.LastName
+        form.first_name.data = account.FirstName
+        form.address.data = account.Address
+        form.zipcode.data = account.ZipCode
+        form.phone.data = account.Phone
+        form.credit_card.data = account.CreditCardNumber
+        form.user_email.data = account.Email
+    return render_template(
+        "profile.html",
+        form=form)
 
 @app.route('/user/<int:user_id>', defaults={'page':1}, methods=["POST", "GET"])
 @app.route('/user/<int:user_id>/page/<int:page>', methods=['GET', 'POST'])
 @login_required
 def users(user_id, page):
     form = AboutMeForm()
-    if user_id != current_user.id:
+    if user_id != current_user.Id:
         flash("Sorry, you can only view your profile!", "error")
         return redirect("/index")
 
     # pagination = user.posts.paginate(page, PER_PAGE, False).items
-    pagination = Post.query.filter_by(
-        user_id = current_user.id
-        ).order_by(
-        db.desc(Post.timestamp)
-        ).paginate(page, PER_PAGE, False)
     return render_template(
         "user.html",
-        form=form,
-        pagination=pagination)
+        form=form)
 
 
 @app.route('/publish/<int:user_id>', methods=["POST", "GET"])
@@ -281,35 +255,68 @@ def publish_movie(user_id):
         "publish_movie.html",
         form=form)
 
+@app.route('/list')
+@app.route('/list/<int:action>/<string:query>', methods=["POST", "GET"])
+def list(action, query = None):
+    session = db.session()
+    if current_user.is_authenticated():
+        user_id = current_user.get_id()
 
-@app.route('/user/about-me/<int:user_id>', methods=["POST", "GET"])
-@login_required
-def about_me(user_id):
-    user = User.query.filter(User.id == user_id).first()
-    if request.method == "POST":
-        content = request.form.get("describe")
-        if len(content) and len(content) <= 140:
-            user.about_me = content
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                flash("Database error!")
-                return redirect(url_for("users", user_id=user_id))
-        else:
-            flash("Sorry, May be your data have some error.")
-    return redirect(url_for("users", user_id=user_id))
+        if action == 1: # view Order List
+            orders = getOrder(user_id)
+            if not orders:
+                flash("Empty Order List")
+            return render_template(
+                "list.html",
+                orders=orders,
+                action=action)
+        elif action == 2: # view MovieQ List
+            print('get action, ', action)
+            movies = getMovieQ(user_id)
+            print('find movies:', movies)
+            if not movies:
+                flash("Empty Queue")
+            return render_template(
+                "list.html",
+                movies=movies,
+                action=action)
+        elif action == 3: # view MovieF List
+            movies = getMovieF(user_id)
+            if not movies:
+                flash("Empty F")
+            return render_template(
+                "list.html",
+                movies=movies,
+                action=action)
+        elif action == 4: # view reivew list
+            pass
+    elif action == 5: # search list, not require log in
+        pass
+    return redirect_back('index')
 
-@app.route('/add/<int:user_id>/<int:movie_id>', methods=["POST", "GET"])
-@login_required
-def add(user_id, movie_id):
-    user = User.query.filter(User.id == user_id).first()
-    movie = Movie.query.filter(Movie.id == movie_id).first()
-    print(user.cart.__len__())
-    user.cart.append(movie)
+@app.route('/add')
+@app.route('/add/<int:action>/<int:movie_id>', methods=["POST", "GET"])
+def add(action, movie_id):
+    session = db.session()
+    if current_user.is_authenticated():
+        user_id = current_user.get_id()
 
-    db.session.add(user)
-    db.session.commit()
-
-    flash("is added to Cart")
-    return redirect(url_for('index'))
+        if action == 1: # add to OrderId
+            pass
+        elif action == 2: # add to MovieQ
+            if addMovieQ(user_id, movie_id):
+                flash("is added to Queue")
+                redirect_back('index')
+            else:
+                flash("NO added to Queue")
+                redirect_back('index')
+        elif action == 3: # add to MovieF
+            if addMovieF(user_id, movie_id):
+                flash("is added to F")
+                redirect_back('index')
+            else:
+                flash("NO added to F")
+                redirect_back('index')
+        elif action == 4: # add reivew
+            pass
+    return redirect_back('index')

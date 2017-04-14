@@ -11,14 +11,12 @@
 {% endif %}
 
 <div id="aboutMe" style="display:none;">
-    <form action="{{ url_for("about_me", user_id=current_user.id) }}" method="POST">
+    <form action="{{ url_for("about_me", user_id=current_user.Id) }}" method="POST">
         {{ form.hidden_tag() }}
         {{ form.describe }}
         {{ form.submit }}
     </form>
 </div>
-
-<p style="color:#4c4c4c;">last log: {{ current_user.last_seen.strftime("%a, %d %b %Y %H:%M:%S") }}</p>
 
 <a href="{{ url_for("publish", user_id=current_user.id) }}">Want to publish blogs?</a>
 
@@ -34,7 +32,7 @@
     <a href="{{ url_for('users', user_id=current_user.id, page=pagination.prev_num) }}"><< prev</a>
     {% else %}
     << None
-    {% endif %} | 
+    {% endif %} |
     {% if pagination.has_next %}
     <a href="{{ url_for('users', user_id=current_user.id, page=pagination.next_num) }}">next >></a>
     {% else %}

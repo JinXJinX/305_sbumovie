@@ -1,37 +1,128 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static',filename='css/heroic-features.css') }}" rel="stylesheet" charset="utf-8">
+    <link href="{{ url_for('static',filename='css/sbu-movie.css') }}" rel="stylesheet" charset="utf-8">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
     {% if title %}
     <title>{{title}} - CSE305</title>
     {% else %}
-    <title>microblog</title>
+    <title>SBU MOVIE</title>
     {% endif %}
   </head>
+
   <body>
-    <div>CSE305 
-        {% if current_user.is_authenticated %}
-        | {{ current_user.customer_id }} |
-        {% endif %}
-        <a href="{{ url_for('index') }}">Home</a>
-        {% if not current_user.is_authenticated %}
-        | <a href="{{ url_for('login') }}">Log in</a>
-        or <a href="{{ url_for('sign_up') }}">Sign up</a>
-        {% else %}
-        | <a href="{{ url_for("profile", user_id = current_user.id) }}">Profile</a>
-        | <a href="{{ url_for('logout') }}">Logout</a>
-        | <a href="{{ url_for('publish_movie', user_id = current_user.id) }}">publishmovie</a>
-        {% endif %}
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('index') }}">SBU MOVIE</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  {% if not current_user.is_authenticated %}
+                      {% if 'sign_in' not in request.url_rule.rule %}
+                      <li>
+                        <a href="{{ url_for('sign_in') }}">Sign in</a>
+                      </li>
+                      {% endif %}
+                      {% if 'sign_up' not in request.url_rule.rule %}
+                      <li>
+                        <a href="{{ url_for('sign_up') }}">Sign up</a>
+                      </li>
+                      {% endif %}
+                  {% else %}
+                  <li>
+                    <a href="{{ url_for("profile") }}">Profile</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('list', action = 2, query =' ' ) }}">Movie Q</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('list', action = 3, query =' ' ) }}">Movie F</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('list', action = 1, query =' ' ) }}">Order History</a>
+                      {% if current_user.is_admin %}
+                        <li>
+                          <a href="{{ url_for('publish_movie', user_id = current_user.Id) }}">publishmovie</a>
+                        </li>
+                      {% endif %}
+                  {% endif %}
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+        <!-- Jumbotron Header -->
+        <img src="https://images-na.ssl-images-amazon.com/images/G/01/digital/video/tvodmedia/AZ-3000x600-SearchMovies-Opt1-v2._V527642819_UR1500,300_FMPNG_.png" class="img-responsive">
+
+        <div class="row text-center">
+
+            <hr />
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+            <div class = "bg-danger col-md-offset-1 col-md-10 col-sm-12" >
+            {% block content %}
+            {% endblock %}
+            </div>
+        </div>
+    <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; CSE305 2017</p>
+                </div>
+            </div>
+        </footer>
+
     </div>
-    <hr />
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
   </body>
 
   {% block js %}{% endblock %}

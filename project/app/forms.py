@@ -5,35 +5,37 @@ from wtforms import TextField, BooleanField, SubmitField, TextAreaField, RadioFi
 from wtforms.validators import Required, Email, Length, NumberRange, URL
 
 class LoginForm(Form):
-    user_name = TextField('user name', validators=[
+    user_email = TextField('user email', validators=[
+        Required(), Length(max=60)])
+    user_password = TextField('password', validators=[
         Required(), Length(max=20)])
     submit = SubmitField('Log in')
 
 class SignUpForm(Form):
-    user_name = TextField('user name', validators=[
-        Required(), Length(max=20)], default = 'ur name')
     user_email = TextField('user email', validators=[
         Email(), Required(), Length(max=128)])
+    user_password = TextField('pass word', validators=[
+        Required(), Length(max=20)])
+    user_name = TextField('user name', validators=[
+        Length(max=20)])
     last_name = TextField('last name', validators=[
         Length(max=20)])
     first_name = TextField('first name', validators=[
         Length(max=20)])
+    credit_card = TextField('credit card number', validators=[
+        Length(max=20)])
     address = TextField('address', validators=[
         Length(max=50)])
-    city = TextField('city', validators=[
-        Length(max=20)])
-    state = TextField('state', validators=[
-        Length(max=20)])
     zipcode = TextField('zipcode', validators=[
         NumberRange(), Length(max=10)])
     phone = TextField('phone', validators=[
         NumberRange(), Length(max=20)])
     account_type = RadioField('Type',
-                                choices=[('L1','Limited'),
-                                         ('L2','unlimited-1'),
-                                         ('L3','unlimited-2'),
-                                         ('L4','unlimited-3')],
-                                default='L1')
+                                choices=[('Limited','Limited'),
+                                         ('Unlimited-1','Unlimited-1'),
+                                         ('Unlimited-2','Unlimited-2'),
+                                         ('Unlimited-3','Unlimited-3')],
+                                default='Limited')
     submit = SubmitField('Submit!')
 
 

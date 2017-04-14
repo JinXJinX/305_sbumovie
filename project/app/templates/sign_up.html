@@ -2,20 +2,21 @@
 
 {% block content %}
 
-<form action="/sign-up", method="POST" name="sign_up">
+<form action="/sign_up", method="POST" name="sign_up">
     {{ form.hidden_tag() }}
-    <p>*User Name: {{ form.user_name }}</p>
-    {% for error in form.errors.user_name %}
-    <p style="color:red;">[-] {{ error }}</p>
-    {% endfor %}
 
     <p>*E-mail: {{ form.user_email }}</p>
     {% for error in form.errors.user_email %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>Last Name: {{ form.last_name}}</p>
-    {% for error in form.errors.last_name%}
+    <p>*PassWord: {{ form.user_password }}</p>
+    {% for error in form.errors.user_password %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>User Name: {{ form.user_name }}</p>
+    {% for error in form.errors.user_name %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
@@ -24,18 +25,13 @@
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
+    <p>Last Name: {{ form.last_name}}</p>
+    {% for error in form.errors.last_name%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
     <p>Address: {{ form.address}}</p>
     {% for error in form.errors.Address%}
-    <p style="color:red;">[-] {{ error }}</p>
-    {% endfor %}
-
-    <p>City: {{ form.city}}</p>
-    {% for error in form.errors.city%}
-    <p style="color:red;">[-] {{ error }}</p>
-    {% endfor %}
-
-    <p>State: {{ form.state}}</p>
-    {% for error in form.errors.state%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
@@ -44,12 +40,23 @@
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
+    <p>Credit Card Number : {{ form.credit_card}}</p>
+    {% for error in form.errors.credit_card%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
     <p>Phone Number: {{ form.phone}}</p>
     {% for error in form.errors.phone%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>*Account Type: {{ form.account_type}}</p>
+    <p>*Account Type:
+    {% if form.account_type.data == "Admin" or form.account_type.data == "CustRep" %}
+      {{ form.account_type.data }}
+    {% else %}
+      {{ form.account_type}}
+    {% endif %}
+    </p>
     {% for error in form.errors.account_type%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}

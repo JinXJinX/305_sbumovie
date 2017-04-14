@@ -8,27 +8,56 @@
 <h1>Welcome back, {{ current_user.customer_id }}!</h1>
 {% endif %}
 
-{% for post in posts %}
-    <p>{{ post.author.nickname }} : <b>{{ post.body }}</b> [Add To Cart]</p>
-</div>
-{% endfor %}
+<h2>HOT MOVIE</h2>
+{% for movie in hotMovies %}
+    <div class="col-md-3 col-sm-6 hero-feature">
+        <div class="">
+            <img src="http://placehold.it/800x500" alt="" class = "s-image">
+            <!-- {{ movie.ImageUrl}} -->
+            <div class="">
+                <a href="{{ url_for('movie', movie_id = movie.Id) }}">
+                  <h3>{{ movie.Name}}</h3>
+                </a>
+                <p>{{ movie.Rating}} : {{ movie.NumRating}} People</p>
+                <p>{{ movie.Synopsis}}</p>
+                <p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('add', action = 2, movie_id = movie.Id) }}" class="btn btn-primary">
+                      [Add To Cart]
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('sign_in') }}">
+                      [Add To Cart]
+                    </a>
+                    {% endif %}
+                    <a href="#" class="btn btn-default">
+                      More Info
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
 
+{% endfor %}
+<h2>OTHER MOVIE</h2>
 {% for movie in movies %}
-    <p>{{ movie.movie_name}} : <b>{{ movie.type.value }}
+    <p>{{ movie.Name}} : <b>{{ movie.Type}}
       </b>
+      {{ movie.Rating}} | {{ movie.NumRating}} | {{ movie.ImageUrl}} | <br>{{ movie.Synopsis}}
 
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('add', user_id = current_user.id, movie_id = movie.id) }}">
+      <a href="{{ url_for('add', action = 2, movie_id = movie.Id) }}">
         [Add To Cart]
       </a>
       {% else %}
-      <a href="{{ url_for('login') }}">
+      <a href="{{ url_for('sign_in') }}">
         [Add To Cart]
       </a>
       {% endif %}
-
     </p>
-</div>
 {% endfor %}
-
+<h2>REVEWS</h2>
+{% for r in res %}
+    <p>{{ r[0].ReviewId }} : <b>{{ r[0].Content}}</b> : {{ r[1].Name }}</p>
+{% endfor %}
 {% endblock %}

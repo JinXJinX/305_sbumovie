@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if action == 1 %} Order List {% endif %}
+{% if action == 2 %} Movie Q List {% endif %}
+{% if action == 3 %} Movie F List {% endif %}
+{% if action == 4 %} Review List {% endif %}
+{% if action == 5 %} Search Result {% endif %}
+
+{% for movie in movies %}
+    <p>{{ movie.Name}} : <b>{{ movie.Type}}
+      </b>
+      {{ movie.Rating}} | {{ movie.NumRating}} | {{ movie.ImageUrl}} | <br>{{ movie.Synopsis}}
+
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('add', user_id = current_user.Id, movie_id = movie.Id) }}">
+        [Add To Cart]
+      </a>
+      {% else %}
+      <a href="{{ url_for('sign_in') }}">
+        [Add To Cart]
+      </a>
+      {% endif %}
+    </p>
+{% endfor %}
+
+{% for order in orders %}
+    <p>{{ order[0].OrderDate }} : <b>{{ order[0].Price }} </b>
+      {{ order[1].Rating}} | {{ order[1].NumRating}} | {{ order[1].ImageUrl}} | <br>{{ movie.Synopsis}}
+
+      [ Return It ]
+    </p>
+{% endfor %}
+
+{% endblock %}
