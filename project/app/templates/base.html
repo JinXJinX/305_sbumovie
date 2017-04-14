@@ -50,11 +50,13 @@
     <div id="db-nav-movie" class="nav">
       <div class="nav-wrap" height = "90" position="relative">
       <div class="nav-primary" width="900" height = "90">
-        <div class="" style="float:left">
+
+        <div class="sm-logo" style="float:left; width:220px; height:60px; padding-right:10px;  padding-top:9px">
           <a href="{{ url_for('index') }}">
-          <h2> SBU MOVIE </h2>
+            <img src="{{ url_for('static',filename='image/sbumovie_logo.jpeg') }}" class = "" />
           </a>
         </div>
+
 
         <div class="nav-search">
           <form action="https://movie.douban.com/subject_search" method="get">
@@ -150,7 +152,7 @@
           <div id="dale_movie_homepage_top_large"></div>
 
 
-                  <div class="sm_article">
+                    <div class="sm_article">
 
                       <div id="dale_movie_home_main_top"></div>
 

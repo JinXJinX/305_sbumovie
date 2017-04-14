@@ -10,9 +10,9 @@ def getHotMovies():
         .limit(10)
     return movies
 
-def getMovies():
+def getMovies(num):
     session = db.session()
-    movies = session.query(Movie).limit(18).all()
+    movies = session.query(Movie).limit(num).all()
     return movies
 
 def getMovieById(id):

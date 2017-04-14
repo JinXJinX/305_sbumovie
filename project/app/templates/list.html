@@ -1,6 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div class="reviews-bd">
+
+  {% for r in res %}
+        <div class="review ">
+            <div class="review-hd">
+                <a href="https://movie.douban.com/subject/26289144/?from=reviews">
+                        <img class="lazy"
+                            src="../static/image/default_poster.jpg"
+                            alt="{{ r[1].Name }}" />
+                </a>
+            </div>
+            <div class="review-bd">
+                <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r[0].Title }}</a></h3>
+                <div class="review-meta">
+                    <a href="https://www.douban.com/people/153907121/">XXXX</a>
+                    <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ r[1].Name }}</a>
+
+                        <span class="allstar40"></span>
+                </div>
+                <div class="review-content">
+                      {{ r[0].Content}}
+                      <a href="https://movie.douban.com/review/8474636/">(Full)</a>
+                </div>
+            </div>
+        </div>
+  {% endfor %}
+
+</div>
+
+
 {% if action == 1 %} Order List {% endif %}
 {% if action == 2 %} Movie Q List {% endif %}
 {% if action == 3 %} Movie F List {% endif %}
@@ -31,5 +61,7 @@
       [ Return It ]
     </p>
 {% endfor %}
+
+
 
 {% endblock %}

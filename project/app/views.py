@@ -27,7 +27,7 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/index')
 def index():
-    movies = getMovies()
+    movies = getMovies(18)
     hotMovies = getHotMovies()
     res = getHotReviews()
     return render_template(
@@ -114,10 +114,14 @@ def sign_up():
 @app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
 def movie(movie_id = None):
     movie = getMovieById(movie_id)
+    movies = getMovies(12)
+    res = getHotReviews()
     return render_template(
         "movie.html",
         title="Home",
-        movie=movie)
+        movie=movie,
+        movies=movies,
+        res=res)
 
 @app.route('/profile', methods=['GET', 'POST'])
 #@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
