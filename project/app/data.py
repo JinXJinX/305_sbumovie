@@ -12,7 +12,7 @@ def getHotMovies():
 
 def getMovies():
     session = db.session()
-    movies = session.query(Movie).limit(10).all()
+    movies = session.query(Movie).limit(18).all()
     return movies
 
 def getMovieById(id):
@@ -93,4 +93,4 @@ def addOrder(userId, movieId):
     account = getAccount(userId)
     orders = getOrder(userId)
     orders = session.query(Orders).filter_by(AccountId=userId).all()
-    return None 
+    return None

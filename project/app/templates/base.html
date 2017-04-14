@@ -2,10 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="referrer" content="always">
+
+    <link href="https://img3.doubanio.com/f/shire/94213e812acbb00123f685909b4768bb304d16f3/css/douban.css" rel="stylesheet" type="text/css">
+    <link href="https://img3.doubanio.com/f/shire/ae3f5a3e3085968370b1fc63afcecb22d3284848/css/separation/_all.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript">var _head_start = new Date();</script>
+    <script type="text/javascript" src="https://img3.doubanio.com/f/movie/0495cb173e298c28593766009c7b0a953246c5b5/js/movie/lib/jquery.js"></script>
+    <script type="text/javascript" src="https://img3.doubanio.com/f/shire/7c755d690c065c747d3eca09cd3d58ca6d1c2218/js/douban.js"></script>
+    <script type="text/javascript" src="https://img3.doubanio.com/f/shire/0efdc63b77f895eaf85281fb0e44d435c6239a3f/js/separation/_all.js"></script>
+
+    <link rel="stylesheet" href="https://img3.doubanio.com/f/movie/ec5e8f0f5c7a88f57a81d57531e7e8d847e79a03/css/movie/home.css" />
+    <script type="text/javascript" src="https://img3.doubanio.com/f/shire/77323ae72a612bba8b65f845491513ff3329b1bb/js/do.js" data-cfg-autoload="false"    ></script>
+
+    <style type="text/css"></style>
+    <style type="text/css">img { max-width: 100%; }</style>
+    <script type="text/javascript"></script>
+    <link rel="stylesheet" href="https://img3.doubanio.com/misc/mixed_static/79c704f749a60db4.css">
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
@@ -29,93 +43,180 @@
 
   <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url_for('index') }}">SBU MOVIE</a>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                  {% if not current_user.is_authenticated %}
-                      {% if 'sign_in' not in request.url_rule.rule %}
-                      <li>
-                        <a href="{{ url_for('sign_in') }}">Sign in</a>
-                      </li>
-                      {% endif %}
-                      {% if 'sign_up' not in request.url_rule.rule %}
-                      <li>
-                        <a href="{{ url_for('sign_up') }}">Sign up</a>
-                      </li>
-                      {% endif %}
-                  {% else %}
-                  <li>
-                    <a href="{{ url_for("profile") }}">Profile</a>
-                  </li>
-                  <li>
-                    <a href="{{ url_for('logout') }}">Logout</a>
-                  </li>
-                  <li>
-                    <a href="{{ url_for('list', action = 2, query =' ' ) }}">Movie Q</a>
-                  </li>
-                  <li>
-                    <a href="{{ url_for('list', action = 3, query =' ' ) }}">Movie F</a>
-                  </li>
-                  <li>
-                    <a href="{{ url_for('list', action = 1, query =' ' ) }}">Order History</a>
-                      {% if current_user.is_admin %}
+    <script type="text/javascript">var _body_start = new Date();</script>
+
+    <script src="//img3.doubanio.com/dae/accounts/resources/2b54fc2/shire/bundle.js" defer="defer"></script>
+
+    <div id="db-nav-movie" class="nav">
+      <div class="nav-wrap" height = "90" position="relative">
+      <div class="nav-primary" width="900" height = "90">
+        <div class="" style="float:left">
+          <a href="{{ url_for('index') }}">
+          <h2> SBU MOVIE </h2>
+          </a>
+        </div>
+
+        <div class="nav-search">
+          <form action="https://movie.douban.com/subject_search" method="get">
+            <fieldset>
+              <legend>SEARCH: </legend>
+              <label for="inp-query">Movie, Actor, Review, DVD</label>
+              <div class="inp"><input id="inp-query" name="search_text" size="22" maxlength="60" value=""></div>
+              <div class="inp-btn"><input type="submit" value="Search"></div>
+              <input type="hidden" name="cat" value="1002" />
+            </fieldset>
+          </form>
+        </div>
+
+      </div>
+      </div>
+      <div class="nav-secondary">
+
+          <div class="nav-items nav-anon">
+              <ul>
+                    {% if not current_user.is_authenticated %}
+                        {% if 'sign_in' not in request.url_rule.rule %}
                         <li>
-                          <a href="{{ url_for('publish_movie', user_id = current_user.Id) }}">publishmovie</a>
+                          <a href="{{ url_for('sign_in') }}">Sign in</a>
                         </li>
-                      {% endif %}
-                  {% endif %}
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
-    </nav>
-
-    <!-- Page Content -->
-    <div class="container">
-        <!-- Jumbotron Header -->
-        <img src="https://images-na.ssl-images-amazon.com/images/G/01/digital/video/tvodmedia/AZ-3000x600-SearchMovies-Opt1-v2._V527642819_UR1500,300_FMPNG_.png" class="img-responsive">
-
-        <div class="row text-center">
-
-            <hr />
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
-            <div class = "bg-danger col-md-offset-1 col-md-10 col-sm-12" >
-            {% block content %}
-            {% endblock %}
-            </div>
-        </div>
-    <!-- Footer -->
-        <footer>
-            <div class="row">
-                <div class="col-lg-12">
-                    <p>Copyright &copy; CSE305 2017</p>
-                </div>
-            </div>
-        </footer>
-
+                        {% endif %}
+                        {% if 'sign_up' not in request.url_rule.rule %}
+                        <li>
+                          <a href="{{ url_for('sign_up') }}">Sign up</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li>
+                      <a href="{{ url_for("profile") }}">Profile</a>
+                    </li>
+                    <li>
+                      <a href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    <li>
+                      <a href="{{ url_for('list', action = 2, query =' ' ) }}">Movie Q</a>
+                    </li>
+                    <li>
+                      <a href="{{ url_for('list', action = 3, query =' ' ) }}">Movie F</a>
+                    </li>
+                    <li>
+                      <a href="{{ url_for('list', action = 1, query =' ' ) }}">Order History</a>
+                        {% if current_user.is_admin %}
+                          <li>
+                            <a href="{{ url_for('publish_movie', user_id = current_user.Id) }}">publishmovie</a>
+                          </li>
+                        {% endif %}
+                    {% endif %}
+              </ul>
+          </div>
+      </div>
     </div>
+
+      <script id="suggResult" type="text/x-jquery-tmpl">
+          {% raw %}
+          <li data-link="{{= url}}">
+              <a href="{{= url}}" onclick="moreurl(this, {from:'movie_search_sugg'})">
+                  <img src="{{= img}}" width="40" />
+                  <p>
+                      <em>{{= title}}</em>
+                      {{if year}}
+                          <span>{{= year}}</span>
+                      {{/if}}
+                      {{if sub_title}}
+                          <br /><span>{{= sub_title}}</span>
+                      {{/if}}
+                      {{if address}}
+                          <br /><span>{{= address}}</span>
+                      {{/if}}
+                      {{if episode}}
+                          {{if episode=="unknow"}}
+                              <br /><span>集数未知</span>
+                          {{else}}
+                              <br /><span>共{{= episode}}集</span>
+                          {{/if}}
+                      {{/if}}
+                  </p>
+              </a>
+          </li>
+          {% endraw %}
+      </script>
+
+
+<div id="wrapper">
+
+<div id="content">
+
+    <div class="grid-16-8 clearfix">
+
+          <div id="dale_movie_homepage_top_large"></div>
+
+
+                  <div class="sm_article">
+
+                      <div id="dale_movie_home_main_top"></div>
+
+                      <script id="db-tmpl-subject-tip" type="text/x-jquery-tmpl">
+                          {% raw %}
+                          <div id="subject-tip">
+                              <div class="subject-tip-hd">
+                                  <h3>{{= title}}<span class="release-year">{{= release}}</span></h3>
+                                  <p class="star">
+                                      <span class="allstar{{= star}}"></span>
+                                      <span class="subject-rating">{{= rate.toFixed(1)}}</span>
+                                      {{if enough}}
+                                          <span class="rater-num">({{= rater}}people reviews)</span>
+                                      {{/if}}
+                                  </p>
+                              </div>
+                              <div class="subject-tip-bd">
+                                  <ul>
+                                      <li><span>{{= duration}}</span><span>{{= type}}</span><span>{{= region}}</span></li>
+                                      <li class="director"><span class="label">导演</span><span>{{= director}}</span></li>
+                                      <li class="actors"><span class="label">主演</span><span>{{= actors}}</span></li>
+                                  </ul>
+                                  {{if intro}}
+                                      <div class="subject-intro">
+                                          {{= intro}}
+                                      </div>
+                                  {{/if}}
+                              </div>
+                          </div>
+                          {% endraw %}
+                      </script>
+
+                <!-- Page Content -->
+                        <hr />
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        <ul>
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% endwith %}
+
+                        {% block content %}
+
+
+                        {% endblock %}
+                        </div>
+                  </div>
+          </div>
+      </div>
+  </div>
+    <!-- Footer -->
+        <div id="footer">
+          <span id="icp" class="fleft gray-link">
+              &copy; 2017 SBU MOVIE.com, all rights reserved CSE305
+          </span>
+        </div>
+
+    <script type="text/javascript" src="https://img3.doubanio.com/misc/mixed_static/5c2b326fa46fabf3.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://img3.doubanio.com/f/shire/8377b9498330a2e6f056d863987cc7a37eb4d486/css/ui/dialog.css" />
+    <link rel="stylesheet" type="text/css" href="https://img3.doubanio.com/f/movie/1d829b8605b9e81435b127cbf3d16563aaa51838/css/movie/mod/reg_login_pop.css" />
+    <script type="text/javascript" src="https://img3.doubanio.com/f/shire/77323ae72a612bba8b65f845491513ff3329b1bb/js/do.js" data-cfg-autoload="false"></script>
+    <script type="text/javascript" src="https://img3.doubanio.com/f/shire/3d185ca912c999ee7f464749201139ebf8eb6972/js/ui/dialog.js"></script>
+
     <!-- /.container -->
 
     <!-- jQuery -->
