@@ -30,12 +30,14 @@ def index():
     movies = getMovies(18)
     hotMovies = getHotMovies()
     res = getHotReviews()
+    types = get10MovieType()
     return render_template(
         "index.html",
         title="Home",
         movies=movies,
         hotMovies=hotMovies,
-        res=res)
+        res=res,
+        types=types)
 
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
@@ -56,7 +58,10 @@ def sign_in():
                 flash("The Database error!")
                 return redirect('/sign_in')
 
-            flash('Your name: ' + request.form.get('user_email'))
+            if current_user.UserName:
+                flash('Welcome back: ' + current_user.UserName)
+            else:
+                flash('Welcome back: ' + current_user.Email)
             return redirect('index')
         else:
             flash('Login failed, Your name is not exist!')
@@ -114,14 +119,26 @@ def sign_up():
 @app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
 def movie(movie_id = None):
     movie = getMovieById(movie_id)
+    actors = getActors(movie_id)
     movies = getMovies(12)
-    res = getHotReviews()
+    res = getReviews(movie_id)
     return render_template(
         "movie.html",
         title="Home",
         movie=movie,
         movies=movies,
+        actors=actors,
         res=res)
+
+@app.route('/actor/<int:actor_id>', methods=['GET', 'POST'])
+def actor(actor_id = None):
+    actor = getActor(actor_id)
+    movies = getMoviesByActorId(actor_id)
+    return render_template(
+        "actor.html",
+        title="Home",
+        movies=movies,
+        actor=actor)
 
 @app.route('/profile', methods=['GET', 'POST'])
 #@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
@@ -260,19 +277,27 @@ def publish_movie(user_id):
         form=form)
 
 @app.route('/list')
+@app.route('/list/<int:action>/<int:page>', methods=["POST", "GET"])
 @app.route('/list/<int:action>/<string:query>', methods=["POST", "GET"])
-def list(action, query = None):
+@app.route('/list/<int:action>/<string:query>/<int:page>', methods=["POST", "GET"])
+def list(action, query = None, page = None, type = None):
+    print("get ", action, query)
     session = db.session()
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         user_id = current_user.get_id()
 
         if action == 1: # view Order List
-            orders = getOrder(user_id)
-            if not orders:
+            orders, movies = getOrders(user_id, 0)
+            fOrders, fMovies = getOrders(user_id, 1)
+            if not orders and not fOrders:
                 flash("Empty Order List")
             return render_template(
                 "list.html",
                 orders=orders,
+                movies=movies,
+                fOrders=fOrders,
+                fMovies=fMovies,
+                page=None,
                 action=action)
         elif action == 2: # view MovieQ List
             print('get action, ', action)
@@ -294,33 +319,86 @@ def list(action, query = None):
                 action=action)
         elif action == 4: # view reivew list
             pass
-    elif action == 5: # search list, not require log in
-        pass
-    return redirect_back('index')
 
-@app.route('/add')
+    if action == 5: # search list, not require log in
+        pass
+    elif action == 6: # list all
+        num = 20
+        movies = getMovies(page * num)[(num * (page-1)) : (page * num)]
+        return render_template(
+            "list.html",
+            movies=movies,
+            action=action,
+            page=page)
+    elif action == 7: # list by type
+        num = 20
+        movies = getMovieByType(query, page * num)[(num * (page-1)) : (page * num)]
+        return render_template(
+            "list.html",
+            movies=movies,
+            action=action,
+            movie_type=query,
+            page=page)
+    return redirect_back('/')
+
 @app.route('/add/<int:action>/<int:movie_id>', methods=["POST", "GET"])
 def add(action, movie_id):
     session = db.session()
     if current_user.is_authenticated():
         user_id = current_user.get_id()
-
-        if action == 1: # add to OrderId
-            pass
+        movie = getMovieById(movie_id)
+        if action == 1: # add to OrderId, rent dvd
+            res = addOrder(user_id, movie_id, movie.DistrFee)
+            if res == 1:
+                flash("is added to Order")
+            elif res == 0:
+                flash("db err")
+            elif res == 2:
+                flash("update ur account for more movie")
+            elif res == 3:
+                flash("u only can have " + str(current_user.get_limit) + " at one time" )
+            elif res == 4:
+                flash("Its already in rented")
+            redirect('/')
         elif action == 2: # add to MovieQ
             if addMovieQ(user_id, movie_id):
                 flash("is added to Queue")
-                redirect_back('index')
+                redirect('/')
             else:
                 flash("NO added to Queue")
-                redirect_back('index')
+                redirect('/')
         elif action == 3: # add to MovieF
             if addMovieF(user_id, movie_id):
                 flash("is added to F")
-                redirect_back('index')
+                redirect('/')
             else:
                 flash("NO added to F")
-                redirect_back('index')
+                redirect('/')
         elif action == 4: # add reivew
             pass
-    return redirect_back('index')
+        elif action == 5: # return movie
+            res = returnMovie(user_id, movie_id)
+            if res == 1:
+                flash("Thank you!")
+                redirect('/')
+            elif res == 0:
+                flash("db err!")
+                redirect('/')
+            elif res == 2:
+                flash("cant find this movie in list!")
+                redirect('/')
+        elif action == 6: # remove to MovieQ
+            if removeMovieQ(user_id, movie_id):
+                flash("removed to Queue")
+                redirect('/')
+            else:
+                flash("NO added to Queue")
+                redirect('/')
+        elif action == 7: # remove to MovieF
+            if removeMovieF(user_id, movie_id):
+                flash("removed to F")
+                redirect('/')
+            else:
+                flash("err to F")
+                redirect('/')
+    return redirect('/')

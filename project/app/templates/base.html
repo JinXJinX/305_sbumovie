@@ -26,7 +26,6 @@
 
     <!-- Custom CSS -->
     <link href="{{ url_for('static',filename='css/heroic-features.css') }}" rel="stylesheet" charset="utf-8">
-    <link href="{{ url_for('static',filename='css/sbu-movie.css') }}" rel="stylesheet" charset="utf-8">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -53,7 +52,7 @@
 
         <div class="sm-logo" style="float:left; width:220px; height:60px; padding-right:10px;  padding-top:9px">
           <a href="{{ url_for('index') }}">
-            <img src="{{ url_for('static',filename='image/sbumovie_logo.jpeg') }}" class = "" />
+            <img src="{{ url_for('static',filename='image/sbumovie_logo.jpeg') }}" class = "" width = "220" height="36" />
           </a>
         </div>
 
@@ -113,36 +112,6 @@
       </div>
     </div>
 
-      <script id="suggResult" type="text/x-jquery-tmpl">
-          {% raw %}
-          <li data-link="{{= url}}">
-              <a href="{{= url}}" onclick="moreurl(this, {from:'movie_search_sugg'})">
-                  <img src="{{= img}}" width="40" />
-                  <p>
-                      <em>{{= title}}</em>
-                      {{if year}}
-                          <span>{{= year}}</span>
-                      {{/if}}
-                      {{if sub_title}}
-                          <br /><span>{{= sub_title}}</span>
-                      {{/if}}
-                      {{if address}}
-                          <br /><span>{{= address}}</span>
-                      {{/if}}
-                      {{if episode}}
-                          {{if episode=="unknow"}}
-                              <br /><span>集数未知</span>
-                          {{else}}
-                              <br /><span>共{{= episode}}集</span>
-                          {{/if}}
-                      {{/if}}
-                  </p>
-              </a>
-          </li>
-          {% endraw %}
-      </script>
-
-
 <div id="wrapper">
 
 <div id="content">
@@ -172,8 +141,8 @@
                               <div class="subject-tip-bd">
                                   <ul>
                                       <li><span>{{= duration}}</span><span>{{= type}}</span><span>{{= region}}</span></li>
-                                      <li class="director"><span class="label">导演</span><span>{{= director}}</span></li>
-                                      <li class="actors"><span class="label">主演</span><span>{{= actors}}</span></li>
+                                      <li class="director"><span class="label">Director</span><span>{{= director}}</span></li>
+                                      <li class="actors"><span class="label">Actors</span><span>{{= actors}}</span></li>
                                   </ul>
                                   {{if intro}}
                                       <div class="subject-intro">
@@ -186,15 +155,16 @@
                       </script>
 
                 <!-- Page Content -->
-                        <hr />
                         {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                        <ul>
-                            {% for message in messages %}
-                            <li>{{ message }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
+                        <h2>
+                          {% if messages %}
+                          <ul>
+                              {% for message in messages %}
+                              <li>{{ message }}</li>
+                              {% endfor %}
+                          </ul>
+                          {% endif %}
+                        </h2>
                         {% endwith %}
 
                         {% block content %}
@@ -221,11 +191,11 @@
 
     <!-- /.container -->
 
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
-
+    <!-- jQuery
+    <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+    -->
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
   </body>
 
   {% block js %}{% endblock %}

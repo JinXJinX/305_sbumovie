@@ -4,7 +4,7 @@
 
 <h1>
         <span property="v:itemreviewed">{{ movie.Name }}</span>
-            <span class="year">(2016)</span>
+            <span class="year">({{ movie.ReleaseDate[:4] }})</span>
 </h1>
 
 <div class="indent clearfix">
@@ -12,18 +12,27 @@
                 <div class="subject clearfix">
 
                     <div id="mainpic" class="">
-                            <img src="https://img3.doubanio.com/view/movie_poster_cover/lpst/public/p2341617105.jpg" alt="The Ticket" rel="v:image">
+                            {% if movie.ImageUrl %}
+                            <img src="{{ movie.ImageUrl }}" alt="{{ movie.Name}}" rel="v:image" class="" />
+                            {% else %}
+                            <img src="../static/image/default_poster.jpg" alt="{{ movie.Name}} " rel="v:image">
+                            {% endif %}
                     </div>
 
                     <div id="info">
-                            <span><span class="pl">Director</span>: <span class="attrs"><a href="/search/Ido%20Fluk" rel="v:directedBy">Ido Fluk</a></span></span><br>
-                            <span class="actor"><span class="pl">Actors</span>: <span class="attrs"><span><a href="/celebrity/1027527/" rel="v:starring">丹·史蒂文斯</a> / </span><span><a href="/celebrity/1058055/" rel="v:starring">玛琳·阿克曼</a> / </span><span><a href="/celebrity/1324100/" rel="v:starring">凯瑞·碧许</a> / </span><span><a href="/celebrity/1013849/" rel="v:starring">奥利弗·普莱特</a> / </span><span><a href="/celebrity/1127199/" rel="v:starring">安德鲁·波尔克</a> / </span><span style="display: none;"><a href="/celebrity/1218506/" rel="v:starring">Rich Lounello</a></span><a href="javascript:;" class="more-actor" title="More Actors">More</a></span></span><br>
-                            <span class="pl">Type:</span> <span property="v:genre">{{ movie.Type}}</span><br>
-                            <span class="pl">制片国家/地区:</span> 美国<br>
-                            <span class="pl">Language:</span> EN<br>
-                            <span class="pl">Release Date:</span> <span property="v:initialReleaseDate" content="2016-04-16">2016-04-16</span><br>
-                            <span class="pl">Length:</span> <span property="v:runtime" content="97">97 Min</span><br>
-                            <span class="pl">IMDB ID:</span> <a href="http://www.imdb.com/title/tt3893280" target="_blank" rel="nofollow">tt3893280</a><br>
+                            <span><span class="pl">Director</span>: <span class="attrs"><a href="/search/Ido%20Fluk" rel="v:directedBy">{{ movie.Director }}</a></span></span><br>
+                                <span class="actor"><span class="pl">Actors</span>:
+                                      <span class="attrs">
+                                          {% for actor in actors %}
+                                                <span><a href="{{ url_for('actor', actor_id=actor.Id) }}" rel="v:starring">{{actor.Name}}</a> / </span>
+                                          {% endfor %}
+                                      </span>
+                                </span><br>
+                            <span class="pl">Type:</span> <span property="v:genre">{{ movie.Type }}</span><br>
+                            <span class="pl">Language:</span> {{ movie.Language }}<br>
+                            <span class="pl">Release Date:</span> <span property="v:initialReleaseDate" content="2016-04-16">{{ movie.ReleaseDate }}</span><br>
+                            <span class="pl">Length:</span> <span property="v:runtime" content="97">{{ movie.Length }} Min</span><br>
+                            <span class="pl">IMDB ID:</span> <a href="http://www.imdb.com/title/tt3893280" target="_blank" rel="nofollow">{{ movie.ImdbId }}</a><br>
                     </div>
 
                 </div>
@@ -44,7 +53,7 @@
                             <div class="rating_right ">
                                 <div class="ll bigstar bigstar35"></div>
                                 <div class="rating_sum">
-                                        <a href="collections" class="rating_people"><span property="v:votes">573</span>人评价</a>
+                                        <a href="collections" class="rating_people"><span property="v:votes">{{ movie.sum() }}</span> People</a>
                                 </div>
                             </div>
                         </div>
@@ -52,46 +61,46 @@
                         <div class="ratings-on-weight">
                                 <div class="item">
                                 <span class="stars5 starstop" title="力荐">
-                                    5 Stars
+                                    5 S
                                 </span>
                                 <div class="power" style="width:13px"></div>
-                                <span class="rating_per">10.4%</span>
+                                <span class="rating_per">{{ movie.percent5() }}</span>
                                 <br>
                                 </div>
                                 <div class="item">
 
                                 <span class="stars4 starstop" title="推荐">
-                                    4 Starts
+                                    4 S
                                 </span>
                                 <div class="power" style="width:27px"></div>
-                                <span class="rating_per">21.6%</span>
+                                <span class="rating_per">{{ movie.percent4() }}</span>
                                 <br>
                                 </div>
                                 <div class="item">
 
                                 <span class="stars3 starstop" title="还行">
-                                    3 Starts
+                                    3 S
                                 </span>
                                 <div class="power" style="width:64px"></div>
-                                <span class="rating_per">51.1%</span>
+                                <span class="rating_per">{{ movie.percent3() }}</span>
                                 <br>
                                 </div>
                                 <div class="item">
 
                                 <span class="stars2 starstop" title="较差">
-                                    2 Starts
+                                    2 S
                                 </span>
                                 <div class="power" style="width:18px"></div>
-                                <span class="rating_per">14.8%</span>
+                                <span class="rating_per">{{ movie.percent2() }}</span>
                                 <br>
                                 </div>
                                 <div class="item">
 
                                 <span class="stars1 starstop" title="很差">
-                                    1 Starts
+                                    1 S
                                 </span>
                                 <div class="power" style="width:2px"></div>
-                                <span class="rating_per">2.0%</span>
+                                <span class="rating_per">{{ movie.percent1() }}</span>
                                 <br>
                                 </div>
                         </div>
@@ -99,28 +108,28 @@
                 </div>
 
                 <div id="interest_sectl" style= "width:220px">
-                    <a href="https://www.douban.com/reason=collectwish&amp;ck=" rel="nofollow" class="j a_show_login colbutt ll" name="pbtn-25937856-wish">
+                    <a href="{{ url_for('add', action = 1, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-wish">
                         <span>Rent This Movie Today</span>
                     </a>
-                    <a href="https://www.douban.com/reason=collectwish&amp;ck=" rel="nofollow" class="j a_show_login colbutt ll" name="pbtn-25937856-wish">
+                    <a href="{{ url_for('add', action = 3, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-wish">
                         <span>WishList</span>
                     </a>
-                    <a href="https://www.douban.com/reason=collectcollect&amp;ck=" rel="nofollow" class="j a_show_login colbutt ll" name="pbtn-25937856-collect">
+                    <a href="{{ url_for('add', action = 2, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-collect">
                         <span>Add To Cart</span>
                     </a>
 
                       <div class="ll j a_stars">
                           Rating Movie:
                           <span id="rating"> <span id="stars" data-solid="https://img3.doubanio.com/f/shire/5a2327c04c0c231bced131ddf3f4467eb80c1c86/pics/rating_icons/star_onmouseover.png" data-hollow="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" data-solid-2x="https://img3.doubanio.com/f/shire/7258904022439076d57303c3b06ad195bf1dc41a/pics/rating_icons/star_onmouseover@2x.png" data-hollow-2x="https://img3.doubanio.com/f/shire/95cc2fa733221bb8edd28ad56a7145a5ad33383e/pics/rating_icons/star_hollow_hover@2x.png">
-                                  <a href="https://www.douban.com/register?reason=rate" class="j a_show_login" name="pbtn-25937856-1">
+                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-1">
                               <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star1" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j a_show_login" name="pbtn-25937856-2">
+                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-2">
                               <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star2" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j a_show_login" name="pbtn-25937856-3">
+                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-3">
                               <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star3" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j a_show_login" name="pbtn-25937856-4">
+                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-4">
                               <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star4" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j a_show_login" name="pbtn-25937856-5">
+                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-5">
                               <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star5" width="16" height="16"></a>
                           </span><span id="rateword" class="pl"></span>
                           <input id="n_rating" type="hidden" value="">
@@ -133,6 +142,36 @@
             <div id="interest_sect_level" class="clearfix">
                     <div class="related-info" style="margin-bottom:-10px;">
                         <a name="intro"></a>
+                                <h2>Starring&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
+                                <div id="gaia">
+                                    <div class="sm-list-wp">
+                                        <div class="sm-list">
+                                          {% for actor in actors %}
+
+                                              <a class="item" target="_blank" href="{{ url_for('actor', actor_id=actor.Id) }}">
+                                                  <div class="cover-wp" data-isnew="false" data-id="{{ actor.Id}}">
+                                                      {% if actor.ImageUrl %}
+                                                      <img src="{{ actor.ImageUrl }}" alt="{{ actor.Name}}" data-x="1200" data-y="1698" height="207" width="140" />
+                                                      {% else %}
+                                                      <img src="../static/image/default_actor.jpg" alt="{{ actor.Name}} " data-x="1200" data-y="1698" height="207" width="140">
+                                                      {% endif %}
+                                                  </div>
+                                                  <p>
+                                                      {{ actor.Name}}
+                                                          <strong>{{ actor.Rating }}</strong>
+                                                  </p>
+                                              </a>
+
+                                          {% endfor %}
+
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
+
+                    <div class="related-info" style="margin-bottom:-10px;">
+                        <a name="intro"></a>
+                        <hr>
                                 <h2>{{ movie.Name}}  SYNOPSIS&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
                                 <div class="indent" id="link-report">
                                             <span property="v:summary" class="">
@@ -141,13 +180,15 @@
                                 </div>
                     </div>
                     <br><br>
+                    {% if movie.TrailerUrl%}
                     <div class="related-info" style="margin-bottom:-10px;">
                         <a name="intro"></a>
                                 <h2>{{ movie.Name}}  Trailer&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
                                 <div class="indent" id="link-report">
-                                            <iframe width="760" height="515" src="https://www.youtube.com/embed/M5dBNY1Frx0" frameborder="0" allowfullscreen></iframe>
+                                            <iframe width="760" height="515" src="{{ movie.TrailerUrl }}" frameborder="0" allowfullscreen></iframe>
                                 </div>
                     </div>
+                    {% endif %}
                     <br><br><br>
 
                     <div class="related-info" style="margin-bottom:-10px;">
@@ -159,12 +200,16 @@
                                           {% for movie in movies %}
 
                                               <a class="item" target="_blank" href="{{ url_for('movie', movie_id = movie.Id) }}">
-                                                  <div class="cover-wp" data-isnew="false" data-id="26279289">
+                                                  <div class="cover-wp" data-isnew="false" data-id="{{ movie.Id}}">
+                                                      {% if movie.ImageUrl %}
+                                                      <img src="{{ movie.ImageUrl }}" alt="{{ movie.Name}}" data-x="1200" data-y="1698" height="207" width="140" />
+                                                      {% else %}
                                                       <img src="../static/image/default_poster.jpg" alt="{{ movie.Name}} " data-x="1200" data-y="1698" height="207" width="140">
+                                                      {% endif %}
                                                   </div>
                                                   <p>
                                                       {{ movie.Name}}
-                                                          <strong>{{ movie.Rating}}</strong>
+                                                          <strong>{{ movie.getRate()}}</strong>
                                                   </p>
                                               </a>
 
@@ -187,27 +232,26 @@
                                 </div>
                     </div>
                     <br><br>
+                    {% if res %}
                     <div class="related-info" style="margin-bottom:-10px;">
-                        <a name="intro"></a>
                                 <h2>{{ movie.Name}}  Reviews&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
                                 {% for r in res %}
                                       <div class="review ">
                                           <div class="review-bd">
-                                              <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r[0].Title }}</a></h3>
+                                              <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r.Author }}</a></h3>
                                               <div class="review-meta">
-                                                  <a href="https://www.douban.com/people/153907121/">XXXX</a>
-                                                  <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ r[1].Name }}</a>
-
+                                                  <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ movie.Name }}</a>
                                                       <span class="allstar40"></span>
                                               </div>
-                                              <div class="review-content">
-                                                    {{ r[0].Content}}
+                                              <div class="review-content" >
+                                                    {{ r.Content[:300]}} ......
                                                     <a href="https://movie.douban.com/review/8474636/">(Full)</a>
                                               </div>
                                           </div>
                                       </div>
                                 {% endfor %}
                     </div>
+                    {% endif %}
             </div>
 
 </div>

@@ -1,5 +1,6 @@
 DROP DATABASE IF EXISTS CSE305;
-CREATE DATABASE CSE305;
+CREATE DATABASE CSE305
+  CHARACTER SET utf8mb4;
 USE CSE305;
 
 CREATE TABLE Location (
@@ -21,7 +22,7 @@ CREATE TABLE Accounts (
   ZipCode INTEGER,
   Phone INTEGER,
   Email VARCHAR(60) NOT NULL,
-  Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
+  Rating INTEGER CHECK (Rating > 10 AND Rating < 101),
   CreditCardNumber VARCHAR(30),
   PRIMARY KEY (Id),
   UNIQUE (Email),
@@ -29,6 +30,7 @@ CREATE TABLE Accounts (
     ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
+INSERT INTO Accounts(`Id`, `Type`,`Email`,`PassWord`) VALUES(1, "Admin", "admin@admin.com", "123");
 
 CREATE TABLE Employee (
   Id INTEGER AUTO_INCREMENT CHECK (Id > 0 AND Id < 1000000000),
@@ -42,14 +44,23 @@ CREATE TABLE Employee (
     ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
+INSERT INTO Employee(`Id`, `SSN`) VALUES(1, "666666");
+
 
 CREATE TABLE Movie (
   Id INTEGER AUTO_INCREMENT,
   Name VARCHAR(100) NOT NULL,
   Type CHAR(20) NOT NULL,
-  Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
-  NumRating INTEGER,
-  DistrFee DECIMAL(7,2),
+  Language CHAR(20),
+  Director VARCHAR(100),
+  Length INTEGER,
+  ReleaseDate VARCHAR(50),
+  Num5Rating INTEGER,
+  Num4Rating INTEGER,
+  Num3Rating INTEGER,
+  Num2Rating INTEGER,
+  Num1Rating INTEGER,
+  DistrFee INTEGER,
   NumCopies INTEGER,
   ImageUrl CHAR(100),
   TrailerUrl CHAR(100),
@@ -61,13 +72,13 @@ CREATE TABLE Movie (
 CREATE TABLE Actor (
   Id INTEGER AUTO_INCREMENT,
   Name VARCHAR(50) NOT NULL,
-  Age INTEGER NOT NULL,
-  Gender CHAR(1) NOT NULL,
+  Dob VARCHAR(50),
   Rating DECIMAL(3,1) CHECK (Rating > 0 AND Rating < 10.1),
   NumRating INTEGER,
   ImageUrl CHAR(100),
   Biography VARCHAR(2000),
   ImdbId CHAR(20),
+  BirthPlace VARCHAR(200),
   PRIMARY KEY (Id)
 );
 
@@ -78,7 +89,7 @@ CREATE TABLE Orders (
   AccountId INTEGER,
   CustRepId INTEGER,
   MovieId INTEGER,
-  Price DECIMAL(7,2),
+  Price INTEGER,
   PRIMARY KEY (Id),
   FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
     ON DELETE NO ACTION
@@ -131,7 +142,7 @@ CREATE TABLE Reviews (
   Id INTEGER AUTO_INCREMENT,
   AccountId INTEGER,
   MovieId INTEGER,
-  Title VARCHAR(200),
+  Author VARCHAR(50),
   Content VARCHAR(10000),
   PRIMARY KEY (Id),
   FOREIGN KEY (AccountId) REFERENCES Accounts (Id)
@@ -140,4 +151,4 @@ CREATE TABLE Reviews (
   FOREIGN KEY (MovieId) REFERENCES Movie (Id)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
-)
+);

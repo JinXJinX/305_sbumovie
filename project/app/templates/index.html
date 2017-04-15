@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<!--
 {% if not current_user.is_authenticated %}
 <h1>Hi There!</h1>
 {% else %}
 <h1>Welcome back, {{ current_user.customer_id }}!</h1>
 {% endif %}
+-->
 
 <div id="screening" class="s" data-dstat-areaid="70" data-dstat-mode="click,expose">
     <div class="screening-hd">
@@ -15,31 +16,62 @@
                 <span class="next-btn"><a class="btn-next" href="javascript:void(0)"></a></span>
             </div>
             <div class="slide-tip"><span class="ui-slide-index">1</span> / <span class="ui-slide-max">6</span></div>
-        <h2>HOT!!!<span><a onclick="moreurl(this, {from:'mv_l_a'})" href="/cinema/nowplaying/">All&raquo;</a></span><span><a onclick="moreurl(this, {from:'mv_l_w'})" href="./later/">Up Coming&raquo;</a></span></h2>
+        <h2>HOT!!!<span><a onclick="moreurl(this, {from:'mv_l_a'})" href="{{ url_for('list', action = 6, page = 1) }}">All&raquo;</a></span><span><a onclick="moreurl(this, {from:'mv_l_w'})" href="./later/">Up Coming&raquo;</a></span></h2>
     </div>
     <div class="screening-bd">
           <ul class="ui-slide-content" data-slide-index="1" data-index-max="6">
 
                 {% for movie in hotMovies %}
-                    <li class="ui-slide-item s" data-dstat-areaid=70_1 data-dstat-mode=click,expose data-dstat-watch=.ui-slide-content data-dstat-viewport=.screening-bd data-title="{{ movie.Name}}" data-release="2017" data-rate="{{ movie.Rating}}" data-star="20" data-trailer="https://movie.douban.com/subject/26260853/trailer" data-ticket="https://movie.douban.com/subject/26260853/cinema/" data-duration="136" data-region="USA" data-director="F.SBU" data-actors="A / B / C" data-intro="" data-enough="True" data-rater="{{ movie.NumRating}}">
+                        <li class="ui-slide-item s"
+                            data-dstat-areaid=70_1
+                            data-dstat-mode=click,expose
+                            data-dstat-watch=.ui-slide-content
+                            data-dstat-viewport=.screening-bd
+                            data-title="{{ movie.Name}}"
+                            data-release="{{ movie.ReleaseDate[:4] }}"
+                            data-rate="{{ movie.getRate() }}"
+                            data-star="{{ movie.getStar() }}"
+                            data-trailer="{{ movie.TrailerUrl }}"
+                            data-duration="{{ movie.Length }}"
+                            data-director="{{ movie.Director }}"
+                            data-actors="{{ movie.TrailerUrl }}"
+                            data-intro="{{ movie.Synopsis }}"
+                            data-enough="False"
+                            data-rater="{{ movie.DistrFee}}">
                         <ul class="">
                             <li class="poster">
-                                <a onclick="moreurl(this, {from:'mv_a_pst'})" href="https://movie.douban.com/subject/26260853/?from=showing">
-                                    <img src="../static/image/default_poster.jpg" alt="{{ movie.Name}}" rel="nofollow" class="" />
+                                <a onclick="moreurl(this, {from:'mv_a_pst'})" href="{{ url_for('movie', movie_id = movie.Id) }}">
+                                    {% if movie.ImageUrl %}
+                                    <img src="{{ movie.ImageUrl }}" alt="{{ movie.Name}}" rel="nofollow" class="" />
+                                    {% else %}
+                                    <img src="../static/image/default_poster.jpg" alt="{{ movie.Name}} " rel="nofollow">
+                                    {% endif %}
                                 </a>
                             </li>
-                            <li class="title">
+                            <li class="title" style="text-overflow: ellipsis;">
                                 <a onclick="moreurl(this, {from:'mv_a_tl'})" href="{{ url_for('movie', movie_id = movie.Id) }}" class="">{{ movie.Name}}</a>
                             </li>
                             <li class="rating">
-                                        <span class="rating-star allstar{{ movie.Rating * 10}}"></span><span class="subject-rate">{{ movie.Rating}}</span>
-                            </li>
-                                <li class="ticket_btn"><span><a onclick="moreurl(this, {from:'mv_b_tc'})" href="https://movie.douban.com/subject/26260853/cinema/">RENT DVD</a></span></li>
-                                {% if current_user.is_authenticated %}
-                                <li class="ticket_btn"><span><a onclick="moreurl(this, {from:'mv_b_tc'})" href="{{ url_for('add', action = 2, movie_id = movie.Id) }}">[Add To Cart]</a></span></li>
+                                {% if movie.getRate() != '0.0' and movie.getRate() != '0' %}
+                                        <span class="rating-star allstar{{ movie.getStar()}}"></span><span class="subject-rate">{{ movie.getRate() }}</span>
                                 {% else %}
-                                <li class="ticket_btn"><span><a onclick="moreurl(this, {from:'mv_b_tc'})" href="{{ url_for('sign_in') }}">[Add To Cart]</a></span></li>
+                                        <span class="rating-star allstar10"></span><span class="subject-rate">0.0</span>
                                 {% endif %}
+
+                            </li>
+
+                            <li class="ticket_btn">
+                              <span>
+                                {% if not current_user.is_authenticated %}
+                                  <a href="{{ url_for('sign_in') }}">
+                                {% else %}
+                                  <a href="{{ url_for('add', action = 1, movie_id = movie.Id) }}">
+                                {% endif %}
+                                  RENT MOVIE
+                                </a>
+                              </span>
+                            </li>
+
                         </ul>
 
                 {% endfor %}
@@ -47,6 +79,15 @@
       </div>
 
 <h2>MORE MOVIE</h2>
+<div>
+        {% for t in types %}
+            <a href="{{ url_for('list', action=7, query = t, page=1) }}">
+              <label style="font-size: 22px;">{{ t }}</label>
+            </a> &nbsp;&nbsp;&nbsp;&nbsp;
+        {% endfor %}
+        <hr>
+</div>
+
 <div id="gaia">
     <div class="sm-list-wp">
         <div class="sm-list">
@@ -54,11 +95,15 @@
 
               <a class="item" target="_blank" href="{{ url_for('movie', movie_id = movie.Id) }}">
                   <div class="cover-wp" data-isnew="false" data-id="26279289">
+                      {% if movie.ImageUrl %}
+                      <img src="{{ movie.ImageUrl }}" alt="{{ movie.Name}}" data-x="1200" data-y="1698" height="207" width="140" />
+                      {% else %}
                       <img src="../static/image/default_poster.jpg" alt="{{ movie.Name}} " data-x="1200" data-y="1698" height="207" width="140">
+                      {% endif %}
                   </div>
                   <p>
                       {{ movie.Name}}
-                          <strong>{{ movie.Rating}}</strong>
+                      <strong>{{ movie.getRate() }}</strong>
                   </p>
               </a>
 
@@ -76,22 +121,24 @@
       {% for r in res %}
             <div class="review ">
                 <div class="review-hd">
-                    <a href="https://movie.douban.com/subject/26289144/?from=reviews">
-                            <img class="lazy"
-                                src="../static/image/default_poster.jpg"
-                                alt="{{ r[1].Name }}" />
+                    <a href="{{ url_for('movie', movie_id = r[1].Id) }}">
+                            {% if r[1].ImageUrl %}
+                            <img class="lazy" src="{{ r[1].ImageUrl }}" alt="{{ r[1].Name }}" />
+                            {% else %}
+                            <img class="lazy" src="../static/image/default_poster.jpg" alt="{{ r[1].Name }}" />
+                            {% endif %}
                     </a>
                 </div>
                 <div class="review-bd">
-                    <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r[0].Title }}</a></h3>
+                    <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r[1].Name }}</a></h3>
                     <div class="review-meta">
-                        <a href="https://www.douban.com/people/153907121/">XXXX</a>
+                        <a href="https://www.douban.com/people/153907121/">{{ r[0].Author }}</a>
                         <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ r[1].Name }}</a>
 
                             <span class="allstar40"></span>
                     </div>
-                    <div class="review-content">
-                          {{ r[0].Content}}
+                    <div class="review-content" >
+                          {{ r[0].Content[:300]}} ......
                           <a href="https://movie.douban.com/review/8474636/">(Full)</a>
                     </div>
                 </div>
