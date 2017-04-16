@@ -47,7 +47,7 @@
     <script src="//img3.doubanio.com/dae/accounts/resources/2b54fc2/shire/bundle.js" defer="defer"></script>
 
     <div id="db-nav-movie" class="nav">
-      <div class="nav-wrap" height = "90" position="relative">
+      <div class="nav-wrap"  position="relative">
       <div class="nav-primary" width="900" height = "90">
 
         <div class="sm-logo" style="float:left; width:220px; height:60px; padding-right:10px;  padding-top:9px">
@@ -58,7 +58,7 @@
 
 
         <div class="nav-search">
-          <form action="https://movie.douban.com/subject_search" method="get">
+          <form action="/search", method="POST" name="search">
             <fieldset>
               <legend>SEARCH: </legend>
               <label for="inp-query">Movie, Actor, Review, DVD</label>
@@ -101,9 +101,9 @@
                     </li>
                     <li>
                       <a href="{{ url_for('list', action = 1, query =' ' ) }}">Order History</a>
-                        {% if current_user.is_admin %}
+                        {% if current_user.is_admin() %}
                           <li>
-                            <a href="{{ url_for('publish_movie', user_id = current_user.Id) }}">publishmovie</a>
+                            <a href="{{ url_for('admin', action = 1, i = 1) }}">Admin-Page</a>
                           </li>
                         {% endif %}
                     {% endif %}

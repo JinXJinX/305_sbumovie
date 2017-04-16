@@ -78,6 +78,7 @@
               </ul>
       </div>
 
+<br><br><br>
 <h2>MORE MOVIE</h2>
 <div>
         {% for t in types %}
@@ -111,11 +112,9 @@
         </div>
     </div>
 </div>
-
+<h2>HOT REVEWS</h2>
 <div id="reviews" class="s" data-dstat-areaid="77" data-dstat-mode="click,expose">
-    <div class="reviews-hd">
-        <h2>HOT REVEWS<span><a href="/review/best/">More&raquo;</a></span></h2>
-    </div>
+
     <div class="reviews-bd">
 
       {% for r in res %}
@@ -130,16 +129,16 @@
                     </a>
                 </div>
                 <div class="review-bd">
-                    <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r[1].Name }}</a></h3>
+                    <h3><a href="{{ url_for('review', review_id = r[0].Id) }}" class="">{{ r[1].Name }}</a></h3>
                     <div class="review-meta">
-                        <a href="https://www.douban.com/people/153907121/">{{ r[0].Author }}</a>
-                        <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ r[1].Name }}</a>
+                        <a href="{{ url_for('review', review_id = r[0].Id) }}">{{ r[0].Author }}</a>
+                        <a href="{{ url_for('movie', movie_id = r[1].Id) }}">{{ r[1].Name }}</a>
 
                             <span class="allstar40"></span>
                     </div>
                     <div class="review-content" >
                           {{ r[0].Content[:300]}} ......
-                          <a href="https://movie.douban.com/review/8474636/">(Full)</a>
+                          <a href="{{ url_for('review', review_id = r[0].Id) }}">(Full)</a>
                     </div>
                 </div>
             </div>

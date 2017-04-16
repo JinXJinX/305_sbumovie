@@ -73,7 +73,11 @@
         </div>
 
         <div class="review-bd" style="width:900px;">
-            <h3><a href="{{ url_for('movie', movie_id = movie.Id) }}" class="">{{ movie.Name }}</a></h3>
+            <h3><a href="{{ url_for('movie', movie_id = movie.Id) }}" class="">{{ movie.Name }}</a>
+              {% if orders %}
+                <p id="order{{orders[i][0].Id}}" style="text-align:center;float:right;"> </p>
+              {% endif %}
+            </h3>
             <div class="review-meta" style="float: left; width:700px;">
                     <span class="allstar{{ movie.getStar() }}"></span>
                     <span>{{ movie.getRate() }}</span>
@@ -130,7 +134,7 @@
                 <ul>
                     <li>
                     {% if action != 1 %}
-                          <a href="" class="j colbutt ll" >
+                          <a href="{{ url_for('add', action = 1, movie_id = movie.Id) }}" class="j colbutt ll" >
                               <span>Rent</span>
                           </a>
                     {% else %}
@@ -140,9 +144,21 @@
                     {% endif %}
                     </li>
                     <li>
-                        <a href="" class="j colbutt ll" >
-                            <span>Add</span>
+                        {% if action == 2 %}
+                        <a href="{{ url_for('add', action = 6, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Remove</span>
                         </a>
+                        {% endif %}
+                        {% if action == 3 %}
+                        <a href="{{ url_for('add', action = 7, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Remove</span>
+                        </a>
+                        {% endif %}
+                        {% if action != 3 and action != 2 %}
+                        <a href="{{ url_for('add', action = 3, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Favorite</span>
+                        </a>
+                        {% endif %}
                     </li>
                 </ul>
             </div>
@@ -150,7 +166,6 @@
         </div>
     </div>
 {% endfor %}
-
 
 {% for i in range(fMovies|length) %}
     {% set movie = fMovies[i] %}
@@ -176,23 +191,66 @@
                   Order Id: {{ fOrders[i][0].Id }}&nbsp;&nbsp;&nbsp;&nbsp;
                   Price: $ <b> {{ fOrders[i][0].Price / 100}} </b><br>
                   Rent Date: {{ fOrders[i][0].OrderDate }} <br>
-                  Return Data: {{ fOrders[i][0].ReturnDate }}
+                  Return Date: {{ fOrders[i][0].ReturnDate }}
             </div>
-
             <div class="" style="float: right;">
                 <ul>
                     <li>
-                          <a href="{{ url_for('add', action = 5, movie_id = movie.Id) }}" class="j colbutt ll" >
+                          <a href="{{ url_for('add', action = 1, movie_id = movie.Id) }}" class="j colbutt ll" >
                               <span>Rent</span>
                           </a>
                     </li>
                     <li>
-                        <a href="" class="j colbutt ll" >
-                            <span>Add</span>
+                        {% if action == 2 %}
+                        <a href="{{ url_for('add', action = 6, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Remove</span>
                         </a>
+                        {% endif %}
+                        {% if action == 3 %}
+                        <a href="{{ url_for('add', action = 7, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Remove</span>
+                        </a>
+                        {% endif %}
+                        {% if action != 3 and action != 2 %}
+                        <a href="{{ url_for('add', action = 3, movie_id = movie.Id) }}" class="j colbutt ll" >
+                            <span>Favorite</span>
+                        </a>
+                        {% endif %}
                     </li>
                 </ul>
             </div>
+        </div>
+    </div>
+{% endfor %}
+{% for actor in actors %}
+    <div class="review ">
+        <div class="review-hd">
+            <a href="{{ url_for('actor', actor_id = actor.Id) }}">
+                    {% if actor.ImageUrl %}
+                    <img class="lazy" src="{{ actor.ImageUrl }}" alt="{{ actor.Name }}" />
+                    {% else %}
+                    <img class="lazy" src="../static/image/default_actor.jpg" alt="{{ actor.Name }}" />
+                    {% endif %}
+            </a>
+        </div>
+
+        <div class="review-bd" style="width:900px;">
+            <h3><a href="{{ url_for('actor', actor_id = actor.Id) }}" class="">{{ actor.Name }}</a></h3>
+            <div class="review-meta" style="float: left; width:700px;">
+                    <span>{{ actor.Rating }}</span>
+                    <span>{{ actor.NumRating }}</span>
+            </div>
+            <div class="review-content" style="float: left; width:700px;">
+                  ImdbId: {{ actor.ImdbId }} <br>
+                  {% if actor.Biography %}
+                    Biography: {{ actor.Biography[:200] }}
+                    <a href="{{ url_for('actor', actor_id = actor.Id) }}">
+                      [more]
+                    </a>
+                  {% endif %}
+            </div>
+
+
 
         </div>
     </div>

@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from sqlalchemy import and_
 import time, sys, traceback
+from sqlalchemy.sql.expression import extract
 
 def getHotMovies():
     session = db.session()
@@ -22,6 +23,11 @@ def getReviews(movieId):
     session = db.session()
     reviews = session.query(Reviews).filter_by(MovieId=movieId).all()
     return reviews
+
+def getReviewById(reviewId):
+    session = db.session()
+    review = session.query(Reviews).filter_by(Id=reviewId).first()
+    return review
 
 def getMovieById(id):
     session = db.session()
@@ -82,9 +88,8 @@ def addMovieQ(userId, movieId):
 
 def removeMovieQ(userId, movieId):
     session = db.session()
-    movieQ = session.query(MovieQ).filter_by(AccountId=userId, MovieId=movieId).first()
     try:
-        movieQ.delete()
+        session.query(MovieQ).filter_by(AccountId=userId, MovieId=movieId).delete()
         session.commit()
         return True
     except:
@@ -117,9 +122,8 @@ def addMovieF(userId, movieId):
 
 def removeMovieF(userId, movieId):
     session = db.session()
-    movieF = session.query(MovieF).filter_by(AccountId=userId, MovieId=movieId).first()
     try:
-        movieF.delete()
+        session.query(MovieF).filter_by(AccountId=userId, MovieId=movieId).delete()
         session.commit()
         return True
     except:
@@ -146,11 +150,10 @@ def getOrders(userId, check):
 def checkCurMonthOrders(userId):
     session = db.session()
     now = datetime.now()
-    numOrders = session.query(Orders).filter(AccountId=userId) \
-                                     .filter(extract('year', OrderDate) == now.year) \
-                                     .filter(extract('month', OrderDate) == now.month) \
-                                     .count()
-    return numOrders
+    numOrders = session.query(Orders).filter_by(AccountId=userId) \
+                                     .filter(extract('year', Orders.OrderDate) == now.year) \
+                                     .filter(extract('month', Orders.OrderDate) == now.month).all()
+    return len(numOrders)
 
 def addOrder(userId, movieId, price):
     session = db.session()
@@ -168,7 +171,7 @@ def addOrder(userId, movieId, price):
         if num >= 2:
             return 2
     limit = account.get_limit()
-    if limit != 999 and unreturnedOrders >= limit:
+    if limit != 999 and len(unreturnedOrders) >= limit:
             return 3
     try:
         order = Orders()
@@ -230,3 +233,37 @@ def getMoviesByActorId(actorId):
         movie = session.query(Movie).filter_by(Id=movId.MovieId).first()
         movies.append(movie)
     return movies
+
+def dataSearch(str):
+    str = str.lower()
+    session = db.session()
+    words = str.split()
+    movies = []
+    actors = []
+    for word in words:
+        q = '%' + word + '%'
+        ms = session.query(Movie).filter(Movie.Name.like(q)).all()
+        movies.extend(ms)
+        ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
+        movies.extend(ms)
+        acts = session.query(Actor).filter(Actor.Name.like(q)).all()
+        actors.extend(acts)
+        acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
+        actors.extend(acts)
+    return movies[:20], actors[:20]
+
+def getUsers(page):
+    num = 20
+    session = db.session()
+    accounts = session.query(Accounts).filter(and_(Accounts.Type!='Admin',Accounts.Type!='CustRep') ).limit(num * page).all()
+    return accounts[num * (page - 1) : (num * page)]
+
+def getEmployees(page):
+    num = 20
+    session = db.session()
+    emps = session.query(Employee).limit(num * page).all()
+    res = []
+    for emp in emps:
+        acc = getAccount(emp.AccountId)
+        res.append([emp, acc])
+    return res[num * (page - 1) : (num * page)]

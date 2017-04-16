@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if action != 1 %}
+  <a href="{{ url_for('admin', action = 1, i = 1) }}">
+  <button type="button" >User List</button>
+  </a>
+  {% endif %}
+  {% if action != 2 and current_user.Type == 'Admin' %}
+  <a href="{{ url_for('admin', action = 2, i = 1) }}">
+  <button type="button" >Emp List</button>
+  </a>
+  {% endif %}
+  <a href="{{ url_for('publish_movie', user_id = current_user.get_id()) }}">
+  <button type="button" >Add Movie</button>
+  </a>
+  <a href="">
+  <button type="button" >Add Actor</button>
+  </a>
+  <hr>
+{% if accounts %}
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Email</th>
+    <th>FirstName</th>
+    <th>LastName</th>
+    <th>Rating</th>
+    <th>Phone</th>
+    <th>Type</th>
+  </tr>
+  {% for acc in accounts %}
+  <tr>
+    <td>{{ acc.Id }}</td>
+    <td>{{ acc.Email }}</td>
+    <td>{{ acc.FirstName }}</td>
+    <td>{{ acc.LastName }}</td>
+    <td>{{ acc.Rating }}</td>
+    <td>{{ acc.Phone }}</td>
+    <td>{{ acc.Type }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if emps %}
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>SSN</th>
+      <th>HourlyRate</th>
+      <th>AccountId</th>
+      <th>Email</th>
+      <th>FirstName</th>
+      <th>LastName</th>
+      <th>Phone</th>
+      <th>Type</th>
+    </tr>
+    {% for emp in emps %}
+    <tr>
+      <td>{{ emp[0].Id }}</td>
+      <td>{{ emp[0].SSN }}</td>
+      <td>{{ emp[0].HourlyRate }}</td>
+      <td>{{ emp[0].AccountId }}</td>
+      <td>{{ emp[1].Email }}</td>
+      <td>{{ emp[1].FirstName }}</td>
+      <td>{{ emp[1].LastName }}</td>
+      <td>{{ emp[1].Phone }}</td>
+      <td>{{ emp[1].Type }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endif %}
+
+{% if page > 1 %}
+  <a href="{{ url_for('admin', action = action, i = page-1) }}">
+  <button type="button" >Prev</button>
+  </a>
+{% endif %}
+{% if accounts|length == 20 %}
+  <a href="{{ url_for('admin', action = action, i = page+1) }}">
+  <button type="button" >Next</button>
+  </a>
+{% endif %}
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+{% endblock %}

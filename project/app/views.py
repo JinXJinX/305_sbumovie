@@ -56,6 +56,8 @@ def sign_in():
                 db.session.commit()
             except:
                 flash("The Database error!")
+                traceback.print_exc(file=sys.stdout)
+                session.rollback()
                 return redirect('/sign_in')
 
             if current_user.UserName:
@@ -83,38 +85,75 @@ def logout():
 def sign_up():
     form = SignUpForm()
     account = Accounts()
+    session = db.session()
     if form.validate_on_submit():
         account.UserName = request.form.get('user_name')
         account.PassWord = request.form.get('user_password')
         account.Type = request.form.get('account_type')
         account.Email = request.form.get('user_email')
         account.CreditCardNumber = request.form.get('credit_card')
-        account.Last_name = request.form.get('last_name')
-        account.First_name = request.form.get('first_name')
+        account.LastName = request.form.get('last_name')
+        account.FirstName = request.form.get('first_name')
         account.Address = request.form.get('address')
-        account.Zipcode = request.form.get('zipcode')
-        account.Phone = request.form.get('phone')
+        account.ZipCode = request.form.get('zipcode')
+        account.Phone = None if not request.form.get('phone') else request.form.get('phone')
 
         register_check = Accounts.login_check(account.UserName, account.PassWord)
         if register_check:
             flash("error: The user's name or email already exists!")
-            return redirect('/sign_up')
+            return render_template(
+                "profile.html",
+                action=0,   #sign up
+                form=form)
 
         try:
-            db.session.add(account)
-            db.session.commit()
+            session.add(account)
+            session.commit()
         except:
             flash("Database error!")
-            print("Unexpected error:", sys.exc_info()[0])
-            return redirect('/sign_up')
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
+            return render_template(
+                "profile.html",
+                action=0,   #sign up
+                form=form)
 
         login_user(account)
         flash("Sign up successful!")
         return redirect('/index')
 
     return render_template(
-        "sign_up.html",
+        "profile.html",
+        action=0,   #sign up
         form=form)
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    query = request.form.get('search_text')
+    if query:
+        movies, actors = dataSearch(query)
+        return render_template(
+            "list.html",
+            title='Search',
+            movies=movies,
+            actors=actors,
+            action=5)
+    return redirect('/')
+
+@app.route('/review/<int:review_id>', methods=['GET', 'POST'])
+def review(review_id):
+    rev = getReviewById(review_id)
+    if not rev:
+        return redirect('/')
+    movie = getMovieById(rev.MovieId)
+    if movie:
+
+        return render_template(
+            "review.html",
+            title='Revie Of ' + movie.Name,
+            movie=movie,
+            rev=rev)
+    return redirect('/')
 
 @app.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
 def movie(movie_id = None):
@@ -154,43 +193,56 @@ def profile():
     account = session.query(Accounts).filter_by(Id=user_id).first()
 
     if form.validate_on_submit():
+
         account = session.query(Accounts).filter_by(Id=user_id).first()
         account.Customer = request.form.get('user_ssn')
         account.UserName = request.form.get('user_name')
         account.PassWord = request.form.get('user_password')
-        account.Type = request.form.get('account_type')
         account.Email = request.form.get('user_email')
         account.CreditCardNumber = request.form.get('credit_card')
-        account.Last_name = request.form.get('last_name')
-        account.First_name = request.form.get('first_name')
+        account.LastName = request.form.get('last_name')
+        account.FirstName = request.form.get('first_name')
         account.Address = request.form.get('address')
-        account.Zipcode = request.form.get('zipcode')
-        account.Phone = request.form.get('phone')
+        account.ZipCode = None if not request.form.get('zipcode') \
+                            else int(request.form.get('zipcode'))
+        account.Phone = None if not request.form.get('phone') \
+                             else int(request.form.get('phone'))
+        upType = 0
+        if account.is_admin():
+            form.account_type.data = account.Type
+        else:
+            upType = 1 if request.form.get('account_type') > account.Type else 0
+            account.Type = request.form.get('account_type')
         try:
             db.session.commit()
         except:
-            print('db err')
             flash("Database error!")
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
             render_template(
                 "profile.html",
+                action=1,
                 form=form)
         print('return pro')
-        flash("Sign up successful!")
+        if upType:
+            flash("Thanks for Your $$$!")
+        else:
+            flash("Saved successful!")
         return render_template(
             "profile.html",
+            action=1,   #profile
             form=form)
-    else:
-        print (form.errors)
-        form.user_name.data = account.UserName
-        form.user_password.data = account.PassWord
-        form.account_type.data = account.Type
-        form.last_name.data = account.LastName
-        form.first_name.data = account.FirstName
-        form.address.data = account.Address
-        form.zipcode.data = account.ZipCode
-        form.phone.data = account.Phone
-        form.credit_card.data = account.CreditCardNumber
-        form.user_email.data = account.Email
+
+    form.user_name.data = account.UserName
+    form.user_password.data = account.PassWord
+    form.account_type.data = account.Type
+    form.last_name.data = account.LastName
+    form.first_name.data = account.FirstName
+    form.address.data = account.Address
+    form.zipcode.data = account.ZipCode
+    form.phone.data = account.Phone
+    form.credit_card.data = account.CreditCardNumber
+    form.user_email.data = account.Email
     return render_template(
         "profile.html",
         form=form)
@@ -215,6 +267,7 @@ def users(user_id, page):
 def publish(user_id):
     form = PublishBlogForm()
     posts = Post()
+    session = db.session()
     if form.validate_on_submit():
         blog_body = request.form.get("body")
         if not len(blog_body.strip(" ")):
@@ -225,10 +278,12 @@ def publish(user_id):
         posts.user_id = user_id
 
         try:
-            db.session.add(posts)
-            db.session.commit()
+            session.add(posts)
+            session.commit()
         except:
             flash("Database error!")
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
             return redirect(url_for("publish", user_id=user_id))
 
         flash("Publish Successful!", "success")
@@ -321,7 +376,15 @@ def list(action, query = None, page = None, type = None):
             pass
 
     if action == 5: # search list, not require log in
-        pass
+        movies, reviews, actors, locations = search(query)
+        return render_template(
+            "list.html",
+            title='Search',
+            movies=movies,
+            reviews=reviews,
+            actors=actors,
+            locations=locations,
+            action=action)
     elif action == 6: # list all
         num = 20
         movies = getMovies(page * num)[(num * (page-1)) : (page * num)]
@@ -335,6 +398,7 @@ def list(action, query = None, page = None, type = None):
         movies = getMovieByType(query, page * num)[(num * (page-1)) : (page * num)]
         return render_template(
             "list.html",
+            title=query,
             movies=movies,
             action=action,
             movie_type=query,
@@ -356,7 +420,7 @@ def add(action, movie_id):
             elif res == 2:
                 flash("update ur account for more movie")
             elif res == 3:
-                flash("u only can have " + str(current_user.get_limit) + " at one time" )
+                flash("u only can have " + str(current_user.get_limit()) + " at one time" )
             elif res == 4:
                 flash("Its already in rented")
             redirect('/')
@@ -401,4 +465,26 @@ def add(action, movie_id):
             else:
                 flash("err to F")
                 redirect('/')
+    return redirect('/')
+
+@app.route('/admin/<int:action>/<int:i>', methods=["POST", "GET"])
+def admin(action, i):
+    session = db.session()
+    if current_user.is_admin():
+        if action == 1: #user list
+            accounts = getUsers(i)
+            return render_template(
+                "admin.html",
+                title='User List',
+                accounts=accounts,
+                action=action,
+                page=i)
+        elif action == 2:
+            emps = getEmployees(i)
+            return render_template(
+                "admin.html",
+                title='Emps List',
+                emps=emps,
+                action=action,
+                page=i)
     return redirect('/')

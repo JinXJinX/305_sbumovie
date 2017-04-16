@@ -2,6 +2,26 @@
 
 {% block content %}
 
-
+<div class="review ">
+    <div class="review-hd">
+        <a href="{{ url_for('movie', movie_id = movie.Id) }}">
+                {% if movie.ImageUrl %}
+                <img class="lazy" src="{{ movie.ImageUrl }}" alt="{{ movie.Name }}" />
+                {% else %}
+                <img class="lazy" src="../static/image/default_poster.jpg" alt="{{ movie.Name }}" />
+                {% endif %}
+        </a>
+    </div>
+    <div class="review-bd">
+        <h3><a href="{{ url_for('movie', movie_id = movie.Id) }}" class="">{{ rev.Author }}</a></h3>
+        <div class="review-meta">
+            <a href="{{ url_for('movie', movie_id = movie.Id) }}">{{ movie.Name }}</a>
+                <span class="allstar40"></span>
+        </div>
+        <div class="review-content" >
+              {{ rev.Content}} 
+        </div>
+    </div>
+</div>
 
 {% endblock %}

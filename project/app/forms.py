@@ -11,6 +11,11 @@ class LoginForm(Form):
         Required(), Length(max=20)])
     submit = SubmitField('Log in')
 
+class SearchForm(Form):
+    query = TextField('', validators=[
+        Required(), Length(max=200)])
+    submit = SubmitField('Search')
+
 class SignUpForm(Form):
     user_email = TextField('user email', validators=[
         Email(), Required(), Length(max=128)])
@@ -19,22 +24,22 @@ class SignUpForm(Form):
     user_name = TextField('user name', validators=[
         Length(max=20)])
     last_name = TextField('last name', validators=[
-        Length(max=20)])
+         Required(), Length(max=20)])
     first_name = TextField('first name', validators=[
-        Length(max=20)])
+         Required(), Length(max=20)])
     credit_card = TextField('credit card number', validators=[
-        Length(max=20)])
+         Required(), Length(max=20)])
     address = TextField('address', validators=[
-        Length(max=50)])
+         Required(), Length(max=50)])
     zipcode = TextField('zipcode', validators=[
-        NumberRange(), Length(max=10)])
+         Required(), NumberRange(), Length(max=10)])
     phone = TextField('phone', validators=[
-        NumberRange(), Length(max=20)])
+         Required(), NumberRange(), Length(max=20)])
     account_type = RadioField('Type',
-                                choices=[('Limited','Limited'),
-                                         ('Unlimited-1','Unlimited-1'),
-                                         ('Unlimited-2','Unlimited-2'),
-                                         ('Unlimited-3','Unlimited-3')],
+                                choices=[('Limited','Limited Plan $10/month'),
+                                         ('Unlimited-1','Unlimited-1 Plan $15/month'),
+                                         ('Unlimited-2','Unlimited-2 Plan $20/month'),
+                                         ('Unlimited-3','Unlimited-3 Plan $25/month')],
                                 default='Limited')
     submit = SubmitField('Submit!')
 
