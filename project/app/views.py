@@ -83,6 +83,7 @@ def logout():
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
+    print('sign up ing')
     form = SignUpForm()
     account = Accounts()
     session = db.session()
@@ -97,14 +98,17 @@ def sign_up():
         account.Address = request.form.get('address')
         account.ZipCode = request.form.get('zipcode')
         account.Phone = None if not request.form.get('phone') else request.form.get('phone')
-
         register_check = Accounts.login_check(account.UserName, account.PassWord)
         if register_check:
             flash("error: The user's name or email already exists!")
             return render_template(
-                "profile.html",
+                "index.html",
                 action=0,   #sign up
                 form=form)
+        zipcode_check = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
+        if not zipcode_check:
+            flash("error: invalid address")
+            redirect('profile.html')
 
         try:
             session.add(account)
@@ -114,7 +118,7 @@ def sign_up():
             traceback.print_exc(file=sys.stdout)
             session.rollback()
             return render_template(
-                "profile.html",
+                "index.html",
                 action=0,   #sign up
                 form=form)
 
@@ -147,7 +151,6 @@ def review(review_id):
         return redirect('/')
     movie = getMovieById(rev.MovieId)
     if movie:
-
         return render_template(
             "review.html",
             title='Revie Of ' + movie.Name,
@@ -161,12 +164,14 @@ def movie(movie_id = None):
     actors = getActors(movie_id)
     movies = getMovies(12)
     res = getReviews(movie_id)
+    rateform = PublishBlogForm()
     return render_template(
         "movie.html",
         title="Home",
         movie=movie,
         movies=movies,
         actors=actors,
+        form=rateform,
         res=res)
 
 @app.route('/actor/<int:actor_id>', methods=['GET', 'POST'])
@@ -190,7 +195,10 @@ def profile():
         user_id = current_user.get_id()
 
     #account = getAccount(user_id)
-    account = session.query(Accounts).filter_by(Id=user_id).first()
+    #account = session.query(Accounts).filter_by(Id=user_id).first()
+    account = current_user
+    print('user id is ' , user_id)
+    print('current account is ', account)
 
     if form.validate_on_submit():
 
@@ -262,37 +270,47 @@ def users(user_id, page):
         form=form)
 
 
-@app.route('/publish/<int:user_id>', methods=["POST", "GET"])
+@app.route('/publish/<int:movie_id>', methods=["POST", "GET"])
 @login_required
-def publish(user_id):
+def publish(movie_id):
     form = PublishBlogForm()
-    posts = Post()
+    review = Reviews()
     session = db.session()
     if form.validate_on_submit():
         blog_body = request.form.get("body")
+        movie = getMovieById(movie_id)
         if not len(blog_body.strip(" ")):
             flash("The content is necessray!")
-            return redirect(url_for("publish", user_id=user_id))
-        posts.body = blog_body
-        posts.timestamp = datetime.datetime.now()
-        posts.user_id = user_id
+            return redirect(url_for("movie", movie_id=movie_id))
+        review.Content = blog_body
+        review.Author = current_user.UserName if current_user.UserName else current_user.Email[:5] + '****'
+        review.MovieId = movie_id
+        review.AccountId = current_user.Id
+        rate = int(request.form.get("rate"))
+        if rate == 1:
+            movie.Num1Rating += 1
+        elif rate == 2:
+            movie.Num2Rating += 1
+        elif rate == 3:
+            movie.Num3Rating += 1
+        elif rate == 4:
+            movie.Num4Rating += 1
+        elif rate == 5:
+            movie.Num5Rating += 1
 
         try:
-            session.add(posts)
+            session.add(review)
             session.commit()
         except:
             flash("Database error!")
             traceback.print_exc(file=sys.stdout)
             session.rollback()
-            return redirect(url_for("publish", user_id=user_id))
+            return redirect(url_for("movie", movie_id=movie_id))
 
         flash("Publish Successful!", "success")
-        return redirect(url_for("publish", user_id=user_id))
+        return redirect(url_for("movie", movie_id=movie_id))
 
-    return render_template(
-        "publish.html",
-        user_id=user_id,
-        form=form)
+    return redirect( "/")
 
 @app.route('/publish_movie/<int:user_id>', methods=["POST", "GET"])
 @login_required

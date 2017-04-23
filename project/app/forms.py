@@ -45,7 +45,13 @@ class SignUpForm(Form):
 
 
 class PublishBlogForm(Form):
-    body = TextAreaField('blog content', validators=[Required()])
+    body = TextAreaField('write rate', validators=[Required()])
+    rate = RadioField('Rate', choices=[('1','1&#9733&nbsp&nbsp'),
+                                         ('2','2&#9733&nbsp&nbsp'),
+                                         ('3','3&#9733&nbsp&nbsp'),
+                                         ('4','4&#9733&nbsp&nbsp'),
+                                         ('5','5&#9733&nbsp&nbsp')],
+                                default='1')
     submit = SubmitField('Submit')
 
 class PublishMovieForm(Form):

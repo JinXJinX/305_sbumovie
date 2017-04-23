@@ -201,6 +201,11 @@
                           </a>
                     </li>
                     <li>
+                          <a href="{{ url_for('movie', movie_id = movie.Id) }}" class="j colbutt ll" >
+                              <span>Rate Movie</span>
+                          </a>
+                    </li>
+                    <li>
                         {% if action == 2 %}
                         <a href="{{ url_for('add', action = 6, movie_id = movie.Id) }}" class="j colbutt ll" >
                             <span>Remove</span>
@@ -259,22 +264,26 @@
 {% if page and page > 1 %}
     {% if action == 7%}
         <a href="{{ url_for('list', action = action, page = page-1, query = movie_type) }}" class="j colbutt ll" >
+            <span>Prev</span>
+        </a>
     {% endif %}
     {% if action == 6%}
         <a href="{{ url_for('list', action = action, page = page-1) }}" class="j colbutt ll" >
-    {% endif %}
             <span>Prev</span>
         </a>
+    {% endif %}
 {% endif %}
 {% if movies.__len__() == 20 %}
-{% if action == 7%}
-    <a href="{{ url_for('list', action = action, page = page+1, query = movie_type) }}" class="j colbutt ll" >
-{% endif %}
-{% if action == 6%}
-    <a href="{{ url_for('list', action = action, page = page+1) }}" class="j colbutt ll" >
-{% endif %}
-        <span>Next</span>
-    </a>
+    {% if action == 7%}
+        <a href="{{ url_for('list', action = action, page = page+1, query = movie_type) }}" class="j colbutt ll" >
+            <span>Next</span>
+        </a>
+    {% endif %}
+    {% if action == 6%}
+        <a href="{{ url_for('list', action = action, page = page+1) }}" class="j colbutt ll" >
+            <span>Next</span>
+        </a>
+    {% endif %}
 {% endif %}
 
 {% endblock %}

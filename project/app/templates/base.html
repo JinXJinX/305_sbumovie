@@ -177,11 +177,6 @@
       </div>
   </div>
     <!-- Footer -->
-        <div id="footer">
-          <span id="icp" class="fleft gray-link">
-              &copy; 2017 SBU MOVIE.com, all rights reserved CSE305
-          </span>
-        </div>
 
     <script type="text/javascript" src="https://img3.doubanio.com/misc/mixed_static/5c2b326fa46fabf3.js"></script>
     <link rel="stylesheet" type="text/css" href="https://img3.doubanio.com/f/shire/8377b9498330a2e6f056d863987cc7a37eb4d486/css/ui/dialog.css" />
@@ -198,5 +193,18 @@
     <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
   </body>
 
+  <footer>
+    <span>
+      <img src="{{  url_for('static',filename='image/ad1.jpg')  }}">
+
+    </span>
+        <div id="footer">
+
+          <span id="icp" class="fleft gray-link">
+              &copy; 2017 SBU MOVIE.com, all rights reserved CSE305
+          </span>
+        </div>
+
+  </footer>
   {% block js %}{% endblock %}
 </html>

@@ -55,6 +55,21 @@ class Accounts(db.Model):
         print(account)
         return account
 
+    def check_rate_movie(self, movieId):
+        session = db.session()
+        orders = session.query(Orders).filter(and_(Orders.MovieId==movieId,Orders.AccountId==self.Id)).all()
+        if not orders:
+            return False
+        for order in orders:
+            if order.ReturnDate:
+                break
+        else:
+            return False
+        review = session.query(Reviews).filter(and_(Reviews.MovieId==movieId, Reviews.AccountId==self.Id)).first()
+        if review:
+            return False
+        return True
+
 class Orders(db.Model):
     __table__ = Table('Orders', metadata, autoload=True)
     def getReturnDate(self):

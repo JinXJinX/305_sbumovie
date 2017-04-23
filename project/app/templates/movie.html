@@ -32,7 +32,7 @@
                             <span class="pl">Language:</span> {{ movie.Language }}<br>
                             <span class="pl">Release Date:</span> <span property="v:initialReleaseDate" content="2016-04-16">{{ movie.ReleaseDate }}</span><br>
                             <span class="pl">Length:</span> <span property="v:runtime" content="97">{{ movie.Length }} Min</span><br>
-                            <span class="pl">IMDB ID:</span> <a href="http://www.imdb.com/title/tt3893280" target="_blank" rel="nofollow">{{ movie.ImdbId }}</a><br>
+                            <span class="pl">IMDB ID:</span> <a href="http://www.imdb.com/title/{{ movie.ImdbId }}" target="_blank" rel="nofollow">{{ movie.ImdbId }}</a><br>
                     </div>
 
                 </div>
@@ -48,19 +48,19 @@
                         </div>
 
                         <div class="rating_self clearfix" typeof="v:Rating">
-                            <strong class="ll rating_num" property="v:average">6.5</strong>
+                            <strong class="ll rating_num" property="v:average">{{ movie.getRate()}}</strong>
                             <span property="v:best" content="10.0"></span>
                             <div class="rating_right ">
                                 <div class="ll bigstar bigstar35"></div>
                                 <div class="rating_sum">
-                                        <a href="collections" class="rating_people"><span property="v:votes">{{ movie.sum() }}</span> People</a>
+                                        <span property="v:votes">{{ movie.sum() }}</span> People
                                 </div>
                             </div>
                         </div>
 
                         <div class="ratings-on-weight">
                                 <div class="item">
-                                <span class="stars5 starstop" title="力荐">
+                                <span class="stars5 starstop" title="5">
                                     5 S
                                 </span>
                                 <div class="power" style="width:13px"></div>
@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="item">
 
-                                <span class="stars4 starstop" title="推荐">
+                                <span class="stars4 starstop" title="4">
                                     4 S
                                 </span>
                                 <div class="power" style="width:27px"></div>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="item">
 
-                                <span class="stars3 starstop" title="还行">
+                                <span class="stars3 starstop" title="3">
                                     3 S
                                 </span>
                                 <div class="power" style="width:64px"></div>
@@ -87,7 +87,7 @@
                                 </div>
                                 <div class="item">
 
-                                <span class="stars2 starstop" title="较差">
+                                <span class="stars2 starstop" title="2">
                                     2 S
                                 </span>
                                 <div class="power" style="width:18px"></div>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="item">
 
-                                <span class="stars1 starstop" title="很差">
+                                <span class="stars1 starstop" title="1">
                                     1 S
                                 </span>
                                 <div class="power" style="width:2px"></div>
@@ -109,39 +109,44 @@
 
                 <div id="interest_sectl" style= "width:220px">
                     <a href="{{ url_for('add', action = 1, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-wish">
-                        <span>Rent This Movie Today</span>
+                        <span>Rent This Movie</span>
                     </a>
                     <a href="{{ url_for('add', action = 3, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-wish">
-                        <span>WishList</span>
+                        <span>Favorite</span>
                     </a>
                     <a href="{{ url_for('add', action = 2, movie_id = movie.Id) }}" rel="nofollow" class="j  colbutt ll" name="pbtn-25937856-collect">
-                        <span>Add To Cart</span>
+                        <span>Add To Queue</span>
                     </a>
 
-                      <div class="ll j a_stars">
-                          Rating Movie:
-                          <span id="rating"> <span id="stars" data-solid="https://img3.doubanio.com/f/shire/5a2327c04c0c231bced131ddf3f4467eb80c1c86/pics/rating_icons/star_onmouseover.png" data-hollow="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" data-solid-2x="https://img3.doubanio.com/f/shire/7258904022439076d57303c3b06ad195bf1dc41a/pics/rating_icons/star_onmouseover@2x.png" data-hollow-2x="https://img3.doubanio.com/f/shire/95cc2fa733221bb8edd28ad56a7145a5ad33383e/pics/rating_icons/star_hollow_hover@2x.png">
-                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-1">
-                              <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star1" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-2">
-                              <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star2" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-3">
-                              <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star3" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-4">
-                              <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star4" width="16" height="16"></a>
-                                  <a href="https://www.douban.com/register?reason=rate" class="j " name="pbtn-25937856-5">
-                              <img src="https://img3.doubanio.com/f/shire/2520c01967207a1735171056ec588c8c1257e5f8/pics/rating_icons/star_hollow_hover.png" id="star5" width="16" height="16"></a>
-                          </span><span id="rateword" class="pl"></span>
-                          <input id="n_rating" type="hidden" value="">
-                          </span>
-                    </div>
+
                 </div>
 
             </div>
 
             <div id="interest_sect_level" class="clearfix">
+                    {% if current_user.check_rate_movie(movie.Id) %}
+                    <div class="" style="">
+                        <hr>
+                        <h2>Rate &nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
+                        <div class="ll j a_stars">
+                            Rating Movie:
+                            <form action="/publish/{{movie.Id}}" method="post" name="rate">
+                               {{ form.hidden_tag() }}
+                               {% for subfield in form.rate %}
+                                      {{ subfield }}
+                                      {{ subfield.label }}
+                              {% endfor %}
+                               <p>{{form.body}}</p>
+                               <p>{{ form.submit }}</p>
+
+                            </form>
+                      </div>
+                      <br><br><br>
+                    </div>
+                    {% endif %}
                     <div class="related-info" style="margin-bottom:-10px;">
                         <a name="intro"></a>
+                        <br><br><br><br><br><hr>
                                 <h2>Starring&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
                                 <div id="gaia">
                                     <div class="sm-list-wp">
@@ -220,32 +225,21 @@
                     </div>
 
                     <br><br>
-                    <div class="related-info" style="margin-bottom:-10px;">
-                        <a name="intro"></a>
-                                <h2>{{ movie.Name}}  Add Review&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
-                                <div class="indent" id="link-report">
-                                  <form>
-                                    <textarea rows="4" cols="50">
-
-                                    </textarea>
-                                  </form>
-                                </div>
-                    </div>
-                    <br><br>
                     {% if res %}
                     <div class="related-info" style="margin-bottom:-10px;">
                                 <h2>{{ movie.Name}}  Reviews&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·&nbsp;&nbsp;·</h2>
                                 {% for r in res %}
                                       <div class="review ">
                                           <div class="review-bd">
-                                              <h3><a href="https://movie.douban.com/review/8474636/" class="">{{ r.Author }}</a></h3>
+                                              <h3><a href="{{ url_for('review', review_id = r.Id) }}" class="">{{ r.Author }}</a></h3>
                                               <div class="review-meta">
-                                                  <a href="https://movie.douban.com/subject/26289144/?from=reviews">{{ movie.Name }}</a>
-                                                      <span class="allstar40"></span>
+                                                  <a href="{{ url_for('review', review_id = r.Id) }}">{{ movie.Name }}</a>
                                               </div>
                                               <div class="review-content" >
-                                                    {{ r.Content[:300]}} ......
-                                                    <a href="https://movie.douban.com/review/8474636/">(Full)</a>
+                                                    {{ r.Content[:280]}}
+                                                    {% if r.Content|length > 280 %}
+                                                    <a href="{{ url_for('review', review_id = r.Id) }}">......(Full)</a>
+                                                    {% endif %}
                                               </div>
                                           </div>
                                       </div>
