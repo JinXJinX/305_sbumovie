@@ -267,12 +267,43 @@ def dataSearch(str):
         actors.extend(acts)
     return movies[:20], actors[:20]
 
+#Actions for admin user
 def getUsers(page):
     num = 20
     session = db.session()
     accounts = session.query(Accounts).filter(and_(Accounts.Type!='Admin',Accounts.Type!='CustRep') ).limit(num * page).all()
     return accounts[num * (page - 1) : (num * page)]
 
+def delUser(userId):
+    session = db.session()
+    try:
+        session.query(Accounts).filter_by(Id = userId).first().delete()
+        session.commit()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()
+
+def delMovie(movieId):
+    session = db.session()
+    try:
+        session.query(Movie).filter_by(Id = movieId).first().delete()
+        session.commit()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()
+
+def delActor(actorId):
+    session = db.session()
+    try:
+        session.query(Actor).filter_by(Id = actorId).first().delete()
+        session.commit()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()
+    
 def getEmployees(page):
     num = 20
     session = db.session()
@@ -282,6 +313,24 @@ def getEmployees(page):
         acc = getAccount(emp.AccountId)
         res.append([emp, acc])
     return res[num * (page - 1) : (num * page)]
+
+def getOrders(page):
+    num = 20
+    session = db.session()
+    orders = session.query(Orders).limit(num * page).all()
+    return accounts[num * (page - 1) : (num * page)]
+
+def getMoviesList(page):
+    num = 20
+    session = db.session()
+    movies = session.query(Movie).limit(num * page).all()
+    return movies[num * (page - 1) : (num * page)]
+
+def getActorList(page):
+    num = 20
+    session = db.session()
+    actors = session.query(Actor).limit(num * page).all()
+    return actors[num * (page - 1) : (num * page)]
 
 def upgradeToCustRep(user_id):
     session = db.session()

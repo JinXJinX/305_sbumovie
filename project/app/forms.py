@@ -31,6 +31,10 @@ class SignUpForm(Form):
          Required(), Length(max=20)])
     address = TextField('address', validators=[
          Required(), Length(max=50)])
+    city = TextField('city', validators=[
+         Required(), Length(max=50)])
+    state = TextField('state', validators=[
+         Required(), Length(max=50)])
     zipcode = TextField('zipcode', validators=[
          Required(), NumberRange(), Length(max=10)])
     phone = TextField('phone', validators=[

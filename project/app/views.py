@@ -107,9 +107,12 @@ def sign_up():
                 form=form)
         zipcode_check = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
         if not zipcode_check:
-            flash("error: invalid address")
-            redirect('profile.html')
-
+            newLocation = Location()
+            newLocation.ZipCode = account.ZipCode
+            newLocation.City = request.form.get('city')
+            newLocation.State = request.form.get('state')
+            session.add(newLocation)
+            session.commit()
         try:
             session.add(account)
             session.commit()
@@ -505,4 +508,31 @@ def admin(action, i):
                 emps=emps,
                 action=action,
                 page=i)
+        elif action == 3: #order list
+            orders = getOrders(i)
+            return render_template(
+                "admin.html",
+                title='Order List',
+                orders=orders,
+                action=action,
+                page=i)
     return redirect('/')
+
+
+@app.route('/upgrade/<int:userId>/<int:i>', methods=["POST", "GET"])
+def upgradeAccount(userId, i): # i 0, cusmRep,  i 1 Admin
+    if i == 0:
+        upgradeToCustRep(userId)
+    elif i == 1:
+        upgradeToAdmin(userId)
+    flash("Upgraded!")
+
+@app.route('/remove/<int:type>/<int:id>', methods=["POST", "GET"])
+def remove(type, id): # type 0 acc, 1 movie, 2 actor
+    if type == 0:
+        delUser(id)
+    elif type == 1:
+        delMovie(id)
+    elif type == 2:
+        delActor(id)
+    flash("deleted!")

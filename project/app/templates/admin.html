@@ -38,6 +38,23 @@
     <td>{{ acc.Rating }}</td>
     <td>{{ acc.Phone }}</td>
     <td>{{ acc.Type }}</td>
+    <td>
+    {% if acc.Type != 'Admin' and acc.Type != 'CustRep' %}
+      <a href = "{% url_for('upgrade', user_id=acc.Id, i = 0) %}">
+      <btn > Upgrade To CustRep </btn>
+      </a>
+    {% endif %}
+    {% if acc.Type == 'CustRep'  %}
+      <a href = "{% url_for('upgrade', user_id=acc.Id, i = 1) %}">
+      <btn > Upgrade To Admin </btn>
+      </a>
+    {% endif %}
+    </td>
+    <td>
+      <a href = "{% url_for('remove', type = 0, id = acc.Id) %}">
+      <btn > Delete </btn>
+      </a>
+    </td>
   </tr>
   {% endfor %}
 </table>
