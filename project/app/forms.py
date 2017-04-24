@@ -73,6 +73,16 @@ class PublishMovieForm(Form):
 
     submit = SubmitField('Submit')
 
+class ActorForm(Form):
+    name = TextField('actor name', validators=[
+        Required(), Length(max=140)])
+    age = TextField('actor name', validators=[
+        Required(), Length(max=140)])
+    type = TextField('actor name', validators=[
+        Required(), Length(max=140)])
+    dob = TextField('actor name', validators=[
+        Required(), Length(max=140)])
+    submit = SubmitField('YES!')
 
 class AboutMeForm(Form):
     describe = TextAreaField('about me', validators=[

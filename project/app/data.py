@@ -132,6 +132,12 @@ def removeMovieF(userId, movieId):
         session.rollback()
         return False
 
+def getRecommandMovies(userId):
+    account = getAccount(userId)
+    accF = getMovieF(userId)
+    accQ = getMovieQ(userId)
+    #TODO
+
 def getOrders(userId, check):
     session = db.session()
     orders = None
@@ -240,6 +246,15 @@ def dataSearch(str):
     words = str.split()
     movies = []
     actors = []
+    q = '%' + str + '%'
+    ms = session.query(Movie).filter(Movie.Name.like(q)).all()
+    movies.extend(ms)
+    ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
+    movies.extend(ms)
+    acts = session.query(Actor).filter(Actor.Name.like(q)).all()
+    actors.extend(acts)
+    acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
+    actors.extend(acts)
     for word in words:
         q = '%' + word + '%'
         ms = session.query(Movie).filter(Movie.Name.like(q)).all()
@@ -267,3 +282,25 @@ def getEmployees(page):
         acc = getAccount(emp.AccountId)
         res.append([emp, acc])
     return res[num * (page - 1) : (num * page)]
+
+def upgradeToCustRep(user_id):
+    session = db.session()
+    account = session.query(Accouts).filter_by(Id = user_id).first()
+    account.Type = 'custRep'
+    try:
+        session.commit()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()
+
+def upgradeToAdmin(user_id):
+    session = db.session()
+    account = getAccount(user_id)
+    account.Type = 'Admin'
+    try:
+        session.commit()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()

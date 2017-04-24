@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="{{ url_for("publish", user_id=current_user.id) }}" method="POST" name="publish">
+<form action="{{ url_for("publish_actor", actor_id=actor.Id }}" method="POST" name="publish">
     {{ form.hidden_tag() }}
 <p>{{ form.body }}</p>
 <p>{{ form.submit }}</p>
