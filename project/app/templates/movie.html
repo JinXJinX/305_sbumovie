@@ -4,7 +4,9 @@
 
 <h1>
         <span property="v:itemreviewed">{{ movie.Name }}</span>
+            {% if movie.ReleaseDate %}
             <span class="year">({{ movie.ReleaseDate[:4] }})</span>
+            {% endif %}
 </h1>
 
 <div class="indent clearfix">
@@ -20,7 +22,7 @@
                     </div>
 
                     <div id="info">
-                            <span><span class="pl">Director</span>: <span class="attrs"><a href="/search/Ido%20Fluk" rel="v:directedBy">{{ movie.Director }}</a></span></span><br>
+                            <span><span class="pl">Director</span>: <span class="attrs">{{ movie.Director }}</span></span><br>
                                 <span class="actor"><span class="pl">Actors</span>:
                                       <span class="attrs">
                                           {% for actor in actors %}
@@ -51,7 +53,7 @@
                             <strong class="ll rating_num" property="v:average">{{ movie.getRate()}}</strong>
                             <span property="v:best" content="10.0"></span>
                             <div class="rating_right ">
-                                <div class="ll bigstar bigstar35"></div>
+                                <div class="ll bigstar bigstar{{ movie.getStar() }}"></div>
                                 <div class="rating_sum">
                                         <span property="v:votes">{{ movie.sum() }}</span> People
                                 </div>
@@ -63,8 +65,8 @@
                                 <span class="stars5 starstop" title="5">
                                     5 S
                                 </span>
-                                <div class="power" style="width:13px"></div>
-                                <span class="rating_per">{{ movie.percent5() }}</span>
+                                <div class="power" style="width:{{ movie.percent5() * 7 / 10 }}px"></div>
+                                <span class="rating_per">{{ movie.percent5() }}%</span>
                                 <br>
                                 </div>
                                 <div class="item">
@@ -72,8 +74,8 @@
                                 <span class="stars4 starstop" title="4">
                                     4 S
                                 </span>
-                                <div class="power" style="width:27px"></div>
-                                <span class="rating_per">{{ movie.percent4() }}</span>
+                                <div class="power" style="width:{{ movie.percent4() * 7 / 10 }}px"></div>
+                                <span class="rating_per">{{ movie.percent4() }}%</span>
                                 <br>
                                 </div>
                                 <div class="item">
@@ -81,8 +83,8 @@
                                 <span class="stars3 starstop" title="3">
                                     3 S
                                 </span>
-                                <div class="power" style="width:64px"></div>
-                                <span class="rating_per">{{ movie.percent3() }}</span>
+                                <div class="power" style="width:{{ movie.percent3() * 7 / 10 }}px"></div>
+                                <span class="rating_per">{{ movie.percent3() }}%</span>
                                 <br>
                                 </div>
                                 <div class="item">
@@ -90,8 +92,8 @@
                                 <span class="stars2 starstop" title="2">
                                     2 S
                                 </span>
-                                <div class="power" style="width:18px"></div>
-                                <span class="rating_per">{{ movie.percent2() }}</span>
+                                <div class="power" style="width:{{ movie.percent2() * 7 / 10 }}px"></div>
+                                <span class="rating_per">{{ movie.percent2() }}%</span>
                                 <br>
                                 </div>
                                 <div class="item">
@@ -99,8 +101,8 @@
                                 <span class="stars1 starstop" title="1">
                                     1 S
                                 </span>
-                                <div class="power" style="width:2px"></div>
-                                <span class="rating_per">{{ movie.percent1() }}</span>
+                                <div class="power" style="width:{{ movie.percent1() * 7 / 10 }}px"></div>
+                                <span class="rating_per">{{ movie.percent1() }}%</span>
                                 <br>
                                 </div>
                         </div>
@@ -172,8 +174,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <br><br><br><br><br><br><br><br>
                     </div>
-
+                    <br><br><br><br><br>
                     <div class="related-info" style="margin-bottom:-10px;" >
                         <a name="intro"></a>
                         <hr>

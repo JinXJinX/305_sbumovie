@@ -82,6 +82,11 @@ class Orders(db.Model):
 class Movie(db.Model):
     __table__ = Table('Movie', metadata, autoload=True)
     def getRate(self):
+        if not self.Num5Rating: self.Num5Rating = 0
+        if not self.Num4Rating: self.Num4Rating = 0
+        if not self.Num3Rating: self.Num3Rating = 0
+        if not self.Num2Rating: self.Num2Rating = 0
+        if not self.Num1Rating: self.Num1Rating = 0
         total = (5 * self.Num5Rating) + (4 * self.Num4Rating) + (3 * self.Num3Rating) + (2 * self.Num2Rating) + (1 * self.Num1Rating)
         num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
         if not num:
@@ -89,6 +94,11 @@ class Movie(db.Model):
         return "{0:.1f}".format((total / num) * 2)
 
     def getStar(self):
+        if not self.Num5Rating: self.Num5Rating = 0
+        if not self.Num4Rating: self.Num4Rating = 0
+        if not self.Num3Rating: self.Num3Rating = 0
+        if not self.Num2Rating: self.Num2Rating = 0
+        if not self.Num1Rating: self.Num1Rating = 0
         total = (5 * self.Num5Rating) + (4 * self.Num4Rating) + (3 * self.Num3Rating) + (2 * self.Num2Rating) + (1 * self.Num1Rating)
         num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
         if not num:
@@ -97,22 +107,22 @@ class Movie(db.Model):
 
     def sum(self):
         num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return num
+        return float(num)
     def percent5(self):
-        num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return "0%" if not num else "{0:.1f}%".format(self.Num5Rating / num)
+        num = self.sum()
+        return 0 if not num else int(100 * float("{0:.2f}".format(self.Num5Rating / float(num))))
     def percent4(self):
-        num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return "0%" if not num else "{0:.1f}%".format(self.Num4Rating / num)
+        num = self.sum()
+        return 0 if not num else int(100 * float("{0:.2f}".format(self.Num4Rating / float(num))))
     def percent3(self):
-        num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return "0%" if not num else "{0:.1f}%".format(self.Num3Rating / num)
+        num = self.sum()
+        return 0 if not num else int(100 * float("{0:.2f}".format(self.Num3Rating / float(num))))
     def percent2(self):
-        num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return "0%" if not num else "{0:.1f}%".format(self.Num2Rating / num)
+        num = self.sum()
+        return 0 if not num else int(100 * float("{0:.2f}".format(self.Num2Rating / float(num))))
     def percent1(self):
-        num = self.Num5Rating + self.Num4Rating +self.Num3Rating + self.Num2Rating+self.Num1Rating
-        return "0%" if not num else "{0:.1f}%".format(self.Num1Rating / num)
+        num = self.sum()
+        return 0 if not num else int(100 * float("{0:.2f}".format(self.Num1Rating / float(num))))
     def getActors(self):
         actors = session = db.session()
         acts = session.query(AppearedIn).filter_by(MovieId=self.Id).all()
@@ -126,6 +136,9 @@ class MovieQ(db.Model):
 
 class MovieF(db.Model):
     __table__ = Table('MovieF', metadata, autoload=True)
+
+class MovieR(db.Model):
+    __table__ = Table('MovieR', metadata, autoload=True)
 
 class AppearedIn(db.Model):
     __table__ = Table('AppearedIn', metadata, autoload=True)

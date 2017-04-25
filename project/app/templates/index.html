@@ -16,28 +16,15 @@
                 <span class="next-btn"><a class="btn-next" href="javascript:void(0)"></a></span>
             </div>
             <div class="slide-tip"><span class="ui-slide-index">1</span> / <span class="ui-slide-max">6</span></div>
-        <h2>HOT!!!<span><a onclick="moreurl(this, {from:'mv_l_a'})" href="{{ url_for('list', action = 6, page = 1) }}">All&raquo;</a></span><span><a onclick="moreurl(this, {from:'mv_l_w'})" href="./later/">Up Coming&raquo;</a></span></h2>
+        <h2>HOT!!!</h2>
     </div>
     <div class="screening-bd">
           <ul class="ui-slide-content" data-slide-index="1" data-index-max="6">
 
                 {% for movie in hotMovies %}
                         <li class="ui-slide-item s"
-                            data-dstat-areaid=70_1
-                            data-dstat-mode=click,expose
-                            data-dstat-watch=.ui-slide-content
-                            data-dstat-viewport=.screening-bd
-                            data-title="{{ movie.Name}}"
-                            data-release="{{ movie.ReleaseDate[:4] }}"
-                            data-rate="{{ movie.getRate() }}"
-                            data-star="{{ movie.getStar() }}"
-                            data-trailer="{{ movie.TrailerUrl }}"
-                            data-duration="{{ movie.Length }}"
-                            data-director="{{ movie.Director }}"
-                            data-actors="{{ movie.TrailerUrl }}"
-                            data-intro="{{ movie.Synopsis }}"
-                            data-enough="False"
-                            data-rater="{{ movie.DistrFee}}">
+
+                            data-rater="">
                         <ul class="">
                             <li class="poster">
                                 <a onclick="moreurl(this, {from:'mv_a_pst'})" href="{{ url_for('movie', movie_id = movie.Id) }}">
@@ -118,6 +105,7 @@
     <div class="reviews-bd">
 
       {% for r in res %}
+            {% if r[1] %}
             <div class="review ">
                 <div class="review-hd">
                     <a href="{{ url_for('movie', movie_id = r[1].Id) }}">
@@ -142,6 +130,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
       {% endfor %}
 
     </div>

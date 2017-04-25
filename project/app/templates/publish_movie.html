@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="{{ url_for("publish_movie", user_id=current_user.id) }}" method="POST" name="publish_movie">
+{% if movie_id %}
+<form action="{{ url_for("edit_movie", movie_id=movie_id) }}" method="POST" name="publish_movie">
+  {% else %}
+<form action="{{ url_for("edit_movie") }}" method="POST" name="publish_movie">
+  {% endif%}
     {{ form.hidden_tag() }}
 
     <p>*Movie Name: {{ form.name }}</p>
@@ -9,7 +13,7 @@
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>{{ form.movie_type }}</p>
+    <p>type: {{ form.movie_type }}</p>
     {% for error in form.errors.movie_type %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
@@ -29,18 +33,28 @@
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>Actor Name: {{ form.actor1 }}</p>
-    {% for error in form.errors.actor1 %}
+    <p>trailer URL: {{ form.trailerUrl }}</p>
+    {% for error in form.errors.trailerUrl %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>Actor Name: {{ form.actor2 }}</p>
-    {% for error in form.errors.actor2 %}
+    <p>language : {{ form.language }}</p>
+    {% for error in form.errors.language %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
-    <p>Actor Name: {{ form.actor3 }}</p>
-    {% for error in form.errors.actor3 %}
+    <p>length : {{ form.length }}</p>
+    {% for error in form.errors.length %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>director: {{ form.director }}</p>
+    {% for error in form.errors.director %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>synopsis: {{ form.synopsis }}</p>
+    {% for error in form.errors.synopsis %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 

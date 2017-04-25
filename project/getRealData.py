@@ -174,3 +174,38 @@ if __name__ == '__main__':
         insert_data(page)
         page += 1
     print('~~~~~~~~~~~~~~Bye~~~~~')
+    # movies = session.query(Movie).all()
+    # size = len(movies)
+    # for m in movies:
+    #     print(str(m.Id) + '~~~~~~~> ' + str(size) + ' left')
+    #     size -= 1
+    #     if m.TrailerUrl:
+    #         m.TrailerUrl.replace('watch?v=', 'embed/')
+    #         session.commit()
+    #     if not m.Num1Rating:
+    #         m.Num1Rating = 0
+    #     if not m.Num2Rating:
+    #         m.Num2Rating = 0
+    #     if not m.Num3Rating:
+    #         m.Num3Rating = 0
+    #     if not m.Num4Rating:
+    #         m.Num4Rating = 0
+    #     if not m.Num5Rating:
+    #         m.Num5Rating = 0
+    #     if m.Num1Rating < 0:
+    #         m.Num1Rating *= -1
+    #         m.Num1Rating += 20
+    #     if m.Num2Rating < 0:
+    #         m.Num2Rating *= -1
+    #         m.Num2Rating += 20
+    #     if m.Num3Rating < 0:
+    #         m.Num3Rating *= -1
+    #         m.Num3Rating += 20
+    #     if m.Num4Rating < 0:
+    #         m.Num4Rating *= -1
+    #         m.Num4Rating += 20
+    #     if m.Num5Rating < 0:
+    #         m.Num5Rating *= -1
+    #         m.Num5Rating += 20
+    #     session.commit()
+    # print('Done')

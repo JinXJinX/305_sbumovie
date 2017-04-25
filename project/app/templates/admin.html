@@ -6,12 +6,27 @@
   <button type="button" >User List</button>
   </a>
   {% endif %}
-  {% if action != 2 and current_user.Type == 'Admin' %}
+  {% if action != 2 %}
   <a href="{{ url_for('admin', action = 2, i = 1) }}">
   <button type="button" >Emp List</button>
   </a>
   {% endif %}
-  <a href="{{ url_for('publish_movie', user_id = current_user.get_id()) }}">
+  {% if action != 3 %}
+  <a href="{{ url_for('admin', action = 3, i = 1) }}">
+  <button type="button" >Order List</button>
+  </a>
+  {% endif %}
+  {% if action != 4 %}
+  <a href="{{ url_for('admin', action = 4, i = 1) }}">
+  <button type="button" >Movie List</button>
+  </a>
+  {% endif %}
+  {% if action != 5 %}
+  <a href="{{ url_for('admin', action = 5, i = 1) }}">
+  <button type="button" >Actor List</button>
+  </a>
+  {% endif %}
+  <a href="{{ url_for('edit_movie') }}">
   <button type="button" >Add Movie</button>
   </a>
   <a href="">
@@ -23,37 +38,38 @@
   <tr>
     <th>ID</th>
     <th>Email</th>
-    <th>FirstName</th>
-    <th>LastName</th>
     <th>Rating</th>
-    <th>Phone</th>
     <th>Type</th>
   </tr>
   {% for acc in accounts %}
   <tr>
     <td>{{ acc.Id }}</td>
     <td>{{ acc.Email }}</td>
-    <td>{{ acc.FirstName }}</td>
-    <td>{{ acc.LastName }}</td>
     <td>{{ acc.Rating }}</td>
-    <td>{{ acc.Phone }}</td>
     <td>{{ acc.Type }}</td>
     <td>
     {% if acc.Type != 'Admin' and acc.Type != 'CustRep' %}
-      <a href = "{% url_for('upgrade', user_id=acc.Id, i = 0) %}">
+      <a href = "{{ url_for('upgrade', userId=acc.Id, i = 0) }}">
       <btn > Upgrade To CustRep </btn>
       </a>
     {% endif %}
     {% if acc.Type == 'CustRep'  %}
-      <a href = "{% url_for('upgrade', user_id=acc.Id, i = 1) %}">
+      <a href = "{{ url_for('upgrade', userId=acc.Id, i = 1) }}">
       <btn > Upgrade To Admin </btn>
       </a>
     {% endif %}
     </td>
     <td>
-      <a href = "{% url_for('remove', type = 0, id = acc.Id) %}">
+      <a href = "{{ url_for('profile', user_id = acc.Id) }}">
+      <btn > Edit </btn>
+      </a>
+    </td>
+    <td>
+      {% if acc.Id != current_user.Id%}
+      <a href = "{{ url_for('remove', type = 0, id = acc.Id) }}">
       <btn > Delete </btn>
       </a>
+      {% endif %}
     </td>
   </tr>
   {% endfor %}
@@ -91,12 +107,82 @@
 
 {% endif %}
 
+{% if orders %}
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>OrderDate</th>
+      <th>ReturnDate</th>
+      <th>AccountId</th>
+      <th>CustRepId</th>
+      <th>MovieId</th>
+    </tr>
+    {% for order in orders%}
+    <tr>
+      <td>{{ order.Id }}</td>
+      <td>{{ order.OrderDate }}</td>
+      <td>{{ order.ReturnDate }}</td>
+      <td>{{ order.AccountId }}</td>
+      <td>{{ order.CustRep }}</td>
+      <td>{{ order.MovieId }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endif %}
+
+{% if movies %}
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>NumCopies</th>
+    </tr>
+    {% for movie in movies %}
+    <tr>
+      <td>{{ movie.Id }}</td>
+      <td>{{ movie.Name }}</td>
+      <td>{{ movie.Type }}</td>
+      <td>{{ movie.NumCopies }}</td>
+      <td>
+        <a href="{{ url_for("edit_movie", movie_id=movie.Id) }}">
+          Edit
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endif %}
+
+{% if actors %}
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Rating</th>
+    </tr>
+    {% for actor in actors%}
+    <tr>
+      <td>{{ actor.Id}}</td>
+      <td>{{ actor.Name}}</td>
+      <td>{{ actor.Rating}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endif %}
+
 {% if page > 1 %}
   <a href="{{ url_for('admin', action = action, i = page-1) }}">
   <button type="button" >Prev</button>
   </a>
 {% endif %}
-{% if accounts|length == 20 %}
+{% if accounts|length == 20 or movies|length == 20 or actors|length == 2 or orders|length == 20 %}
   <a href="{{ url_for('admin', action = action, i = page+1) }}">
   <button type="button" >Next</button>
   </a>

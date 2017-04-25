@@ -35,7 +35,17 @@
     {% endfor %}
 
     <p>*Address: {{ form.address}}</p>
-    {% for error in form.errors.Address%}
+    {% for error in form.errors.address%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>*City: {{ form.city}}</p>
+    {% for error in form.errors.city%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>*State: {{ form.state}}</p>
+    {% for error in form.errors.state%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 

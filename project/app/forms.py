@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from flask_wtf import Form
-from wtforms import TextField, BooleanField, SubmitField, TextAreaField, RadioField, IntegerField, DecimalField
+from wtforms import TextField, DateField, BooleanField, SubmitField, TextAreaField, RadioField, IntegerField, DecimalField
 from wtforms.validators import Required, Email, Length, NumberRange, URL
 
 class LoginForm(Form):
@@ -70,11 +70,14 @@ class PublishMovieForm(Form):
     #description = TextAreaField('description', validators=[Required()])
     copies = IntegerField('Number of Copies', validators=[Required()])
     fee = DecimalField('Price', validators=[Required()])
+    language = TextField('language') #, validators=[URL()]
+    length = IntegerField('movie min') #, validators=[URL()]
+    director = TextField('director') #, validators=[URL()]
+    synopsis = TextField('synopsis') #, validators=[URL()]
+    releaseDate = DateField('date', format='%Y-%m-%d') #, validators=[URL()]
     posterUrl = TextField('Poster Url') #, validators=[URL()]
-    actor1 = TextField('Actor Name')
-    actor2 = TextField('Actor Name')
-    actor3 = TextField('Actor Name')
-
+    trailerUrl = TextField('Trailer Url') #, validators=[URL()]
+    imdbId = TextField('imdb Id') #, validators=[URL()]
     submit = SubmitField('Submit')
 
 class ActorForm(Form):

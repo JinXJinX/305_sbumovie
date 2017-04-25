@@ -27,7 +27,10 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/index')
 def index():
-    movies = getMovies(18)
+    if current_user.is_authenticated:
+        movies = getMovies(18, current_user.Id)
+    else:
+        movies = getMovies(18)
     hotMovies = getHotMovies()
     res = getHotReviews()
     types = get10MovieType()
@@ -42,7 +45,7 @@ def index():
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
     if current_user.is_authenticated:
-        return redirect('index')
+        return redirect('/')
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -64,7 +67,7 @@ def sign_in():
                 flash('Welcome back: ' + current_user.UserName)
             else:
                 flash('Welcome back: ' + current_user.Email)
-            return redirect('index')
+            return redirect('/')
         else:
             flash('Login failed, Your name is not exist!')
             return redirect('/sign_in')
@@ -101,10 +104,7 @@ def sign_up():
         register_check = Accounts.login_check(account.UserName, account.PassWord)
         if register_check:
             flash("error: The user's name or email already exists!")
-            return render_template(
-                "index.html",
-                action=0,   #sign up
-                form=form)
+            return redirect('/')
         zipcode_check = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
         if not zipcode_check:
             newLocation = Location()
@@ -120,14 +120,10 @@ def sign_up():
             flash("Database error!")
             traceback.print_exc(file=sys.stdout)
             session.rollback()
-            return render_template(
-                "index.html",
-                action=0,   #sign up
-                form=form)
-
+            return redirect('/')
         login_user(account)
         flash("Sign up successful!")
-        return redirect('/index')
+        return redirect('/')
 
     return render_template(
         "profile.html",
@@ -165,7 +161,10 @@ def review(review_id):
 def movie(movie_id = None):
     movie = getMovieById(movie_id)
     actors = getActors(movie_id)
-    movies = getMovies(12)
+    if current_user.is_authenticated:
+        movies = getMovies(12, current_user.Id)
+    else:
+        movies = getMovies(12)
     res = getReviews(movie_id)
     rateform = PublishBlogForm()
     return render_template(
@@ -188,23 +187,21 @@ def actor(actor_id = None):
         actor=actor)
 
 @app.route('/profile', methods=['GET', 'POST'])
-#@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/profile/<int:user_id>', methods=['GET', 'POST'])
 @login_required
-def profile():
+def profile(user_id = None):
     form = SignUpForm()
     form.submit.data = 'SAVE'
     session = db.session()
-    if current_user.is_authenticated():
+    if not user_id and current_user.is_authenticated():
         user_id = current_user.get_id()
+        account = current_user
+    else:
+        account = getAccount(user_id)
 
     #account = getAccount(user_id)
     #account = session.query(Accounts).filter_by(Id=user_id).first()
-    account = current_user
-    print('user id is ' , user_id)
-    print('current account is ', account)
-
     if form.validate_on_submit():
-
         account = session.query(Accounts).filter_by(Id=user_id).first()
         account.Customer = request.form.get('user_ssn')
         account.UserName = request.form.get('user_name')
@@ -265,7 +262,7 @@ def users(user_id, page):
     form = AboutMeForm()
     if user_id != current_user.Id:
         flash("Sorry, you can only view your profile!", "error")
-        return redirect("/index")
+        return redirect("/")
 
     # pagination = user.posts.paginate(page, PER_PAGE, False).items
     return render_template(
@@ -509,23 +506,40 @@ def admin(action, i):
                 action=action,
                 page=i)
         elif action == 3: #order list
-            orders = getOrders(i)
+            orders = getOrdersList(i)
             return render_template(
                 "admin.html",
                 title='Order List',
                 orders=orders,
                 action=action,
                 page=i)
+        elif action == 4: #movie list
+            movies = getMoviesList(i)
+            return render_template(
+                "admin.html",
+                title='Movie List',
+                movies=movies,
+                action=action,
+                page=i)
+        elif action == 5: #actor list
+            actors = getActorsList(i)
+            return render_template(
+                "admin.html",
+                title='Order List',
+                actors=actors,
+                action=action,
+                page=i)
     return redirect('/')
 
 
 @app.route('/upgrade/<int:userId>/<int:i>', methods=["POST", "GET"])
-def upgradeAccount(userId, i): # i 0, cusmRep,  i 1 Admin
+def upgrade(userId, i): # i 0, cusmRep,  i 1 Admin
     if i == 0:
         upgradeToCustRep(userId)
     elif i == 1:
         upgradeToAdmin(userId)
     flash("Upgraded!")
+    return redirect('/admin/1/1')
 
 @app.route('/remove/<int:type>/<int:id>', methods=["POST", "GET"])
 def remove(type, id): # type 0 acc, 1 movie, 2 actor
@@ -536,3 +550,60 @@ def remove(type, id): # type 0 acc, 1 movie, 2 actor
     elif type == 2:
         delActor(id)
     flash("deleted!")
+    return redirect('/admin/1/1')
+
+
+@app.route('/edit_movie', methods=['GET', 'POST'])
+@app.route('/edit_movie/<int:movie_id>', methods=['GET', 'POST'])
+@login_required
+def edit_movie(movie_id = None):
+    form = PublishMovieForm()
+    session = db.session()
+    if not current_user.is_authenticated() or not current_user.is_admin():
+        return redirect('/')
+    if movie_id:
+        movie = session.query(Movie).filter_by(Id=movie_id).first()
+    else:
+        movie_id = None
+        movie = Movie()
+    if form.validate_on_submit():
+        movie.Name = request.form.get('name')
+        movie.Type = request.form.get('movie_type')
+        movie.NumCopies = request.form.get('copies')
+        movie.ImageUrl = request.form.get('posterUrl')
+        movie.TrailerUrl = request.form.get('trailerUrl')
+        movie.Language = request.form.get('language')
+        movie.Length = request.form.get('length')
+        movie.Director = request.form.get('director')
+        movie.ReleaseDate = request.form.get('releaseDate')
+        movie.ImdbId = request.form.get('imdbId')
+        movie.Synopsis = request.form.get('synopsis')
+        if not movie_id:
+            session.add(movie)
+        try:
+            session.commit()
+        except:
+            flash("Database error!")
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
+            render_template(
+                "edit_movie.html",
+                form=form)
+        print('return pro')
+        flash(movie.Name + " is Added!")
+        return redirect('/')
+    form.name.data = movie.Name
+    form.name.movie_type = movie.Type
+    form.name.copies = movie.NumCopies
+    form.name.posterUrl = movie.ImageUrl
+    form.name.trailerUrl = movie.TrailerUrl
+    form.name.language = movie.Language
+    form.name.length = movie.Length
+    form.name.director = movie.Director
+    form.name.releaseDate = movie.ReleaseDate
+    form.name.imdbId = movie.ImdbId
+    form.name.synopsis = movie.Synopsis
+    return render_template(
+        "publish_movie.html",
+        movie_id=movie_id,
+        form=form)

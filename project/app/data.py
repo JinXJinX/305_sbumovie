@@ -5,18 +5,15 @@ from datetime import datetime, timedelta
 from sqlalchemy import and_
 import time, sys, traceback
 from sqlalchemy.sql.expression import extract
+from collections import Counter
+from math import ceil
 
 def getHotMovies():
     session = db.session()
     movies = session.query(Movie) \
-        .order_by(Movie.Num5Rating, \
-        Movie.Num4Rating, Movie.Num3Rating) \
+        .filter(Movie.ReleaseDate < '{0:%Y-%m-%d}'.format(datetime.now())) \
+        .order_by(Movie.ReleaseDate.desc()) \
         .limit(20)
-    return movies
-
-def getMovies(num):
-    session = db.session()
-    movies = session.query(Movie).limit(num).all()
     return movies
 
 def getReviews(movieId):
@@ -132,11 +129,64 @@ def removeMovieF(userId, movieId):
         session.rollback()
         return False
 
-def getRecommandMovies(userId):
-    account = getAccount(userId)
-    accF = getMovieF(userId)
-    accQ = getMovieQ(userId)
-    #TODO
+def getMovieR(userId):
+    session = db.session()
+    movieRs = session.query(MovieR).filter_by(AccountId=userId).all()
+    movies = []
+    for movieR in movieRs:
+        movie = getMovieById(movieR.MovieId)
+        movies.append(movie)
+    return movies
+
+def addMovieR(userId, movieId):
+    session = db.session()
+    movieR = MovieR()
+    movieR.AccountId = userId
+    movieR.MovieId = movieId
+    try:
+        session.add(movieR)
+        session.commit()
+        return True
+    except:
+        session.rollback()
+        return False
+
+def removeMovieR(userId, movieId):
+    session = db.session()
+    try:
+        session.query(MovieR).filter_by(AccountId=userId, MovieId=movieId).delete()
+        session.commit()
+        return True
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc(file=sys.stdout)
+        session.rollback()
+        return False
+
+def getMovies(num, userId = None):
+    session = db.session()
+    if not userId:
+        movies = session.query(Movie).limit(num).all()
+        return movies
+    else:
+        movies = getMovieR(userId)
+        if len(movies) < num:
+            fmovies = getMovieF(userId)
+            types = []
+            for fm in fmovies:
+                types.append(fm.Type)
+            c = Counter(types)
+            n = num - len(movies)
+            l = len(types)
+            for k, v in c.items():
+                movies.extend(session.query(Movie)\
+                                .filter_by(Type=k)\
+                                .order_by(Movie.Num5Rating.desc(), Movie.Num4Rating.desc(), Movie.Num3Rating.desc())\
+                                .limit(ceil(v / l * n)).all())
+            if len(movies) < num:
+                movies.extend(session.query(Movie).limit(num - len(movies)).all())
+
+        return movies if len(movies) <= num else movies[:num]
 
 def getOrders(userId, check):
     session = db.session()
@@ -265,19 +315,19 @@ def dataSearch(str):
         actors.extend(acts)
         acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
         actors.extend(acts)
-    return movies[:20], actors[:20]
+    return list(set(movies))[:20], list(set(actors))[:20]
 
 #Actions for admin user
 def getUsers(page):
     num = 20
     session = db.session()
-    accounts = session.query(Accounts).filter(and_(Accounts.Type!='Admin',Accounts.Type!='CustRep') ).limit(num * page).all()
+    accounts = session.query(Accounts).limit(num * page).all()
     return accounts[num * (page - 1) : (num * page)]
 
 def delUser(userId):
     session = db.session()
     try:
-        session.query(Accounts).filter_by(Id = userId).first().delete()
+        session.query(Accounts).filter_by(Id = userId).delete()
         session.commit()
     except:
         print("Unexpected error:", sys.exc_info()[0])
@@ -287,7 +337,7 @@ def delUser(userId):
 def delMovie(movieId):
     session = db.session()
     try:
-        session.query(Movie).filter_by(Id = movieId).first().delete()
+        session.query(Movie).filter_by(Id = movieId).delete()
         session.commit()
     except:
         print("Unexpected error:", sys.exc_info()[0])
@@ -297,13 +347,13 @@ def delMovie(movieId):
 def delActor(actorId):
     session = db.session()
     try:
-        session.query(Actor).filter_by(Id = actorId).first().delete()
+        session.query(Actor).filter_by(Id = actorId).delete()
         session.commit()
     except:
         print("Unexpected error:", sys.exc_info()[0])
         traceback.print_exc(file=sys.stdout)
         session.rollback()
-    
+
 def getEmployees(page):
     num = 20
     session = db.session()
@@ -314,11 +364,11 @@ def getEmployees(page):
         res.append([emp, acc])
     return res[num * (page - 1) : (num * page)]
 
-def getOrders(page):
+def getOrdersList(page):
     num = 20
     session = db.session()
     orders = session.query(Orders).limit(num * page).all()
-    return accounts[num * (page - 1) : (num * page)]
+    return orders[num * (page - 1) : (num * page)]
 
 def getMoviesList(page):
     num = 20
@@ -326,7 +376,7 @@ def getMoviesList(page):
     movies = session.query(Movie).limit(num * page).all()
     return movies[num * (page - 1) : (num * page)]
 
-def getActorList(page):
+def getActorsList(page):
     num = 20
     session = db.session()
     actors = session.query(Actor).limit(num * page).all()
@@ -334,8 +384,8 @@ def getActorList(page):
 
 def upgradeToCustRep(user_id):
     session = db.session()
-    account = session.query(Accouts).filter_by(Id = user_id).first()
-    account.Type = 'custRep'
+    account = session.query(Accounts).filter_by(Id = user_id).first()
+    account.Type = 'CustRep'
     try:
         session.commit()
     except:
