@@ -90,7 +90,6 @@
                   {% endif %}
                 {% else %}
                   Order Id: {{ orders[i][0].Id }}&nbsp;&nbsp;&nbsp;&nbsp;
-                  Price: $ <b> {{ orders[i][0].Price / 100}} </b><br>
                   Rent Date: {{ orders[i][0].OrderDate }} <br>
                   {% if not orders[i][0].ReturnDate %}
                     <p id="order{{orders[i][0].Id}}"> </p>
@@ -189,7 +188,6 @@
             </div>
             <div class="review-content" style="float: left; width:700px;">
                   Order Id: {{ fOrders[i][0].Id }}&nbsp;&nbsp;&nbsp;&nbsp;
-                  Price: $ <b> {{ fOrders[i][0].Price / 100}} </b><br>
                   Rent Date: {{ fOrders[i][0].OrderDate }} <br>
                   Return Date: {{ fOrders[i][0].ReturnDate }}
             </div>

@@ -32,6 +32,9 @@ class Accounts(db.Model):
     def is_admin(self):
         return self.Type == 'Admin' or self.Type == 'CustRep'
 
+    def is_admin_1(self):
+        return self.Type == 'Admin'
+
     def is_anonymous(self):
         return False
 

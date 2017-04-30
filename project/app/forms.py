@@ -61,15 +61,14 @@ class PublishBlogForm(Form):
 class PublishMovieForm(Form):
     name = TextField('Movie Name', validators=[Required()])
     movie_type = RadioField('Type',
-                                choices=[('NA','N/A'),
-                                         ('COMEDY','Comedy'),
+                                choices=[('COMEDY','Comedy'),
                                          ('DRAMA','Drama'),
                                          ('ACTION','Action'),
                                          ('FOREIGN','Foreign')],
-                                default='NA')
+                                default='ACTION',
+                                validators=[Required()])
     #description = TextAreaField('description', validators=[Required()])
     copies = IntegerField('Number of Copies', validators=[Required()])
-    fee = DecimalField('Price', validators=[Required()])
     language = TextField('language') #, validators=[URL()]
     length = IntegerField('movie min') #, validators=[URL()]
     director = TextField('director') #, validators=[URL()]
@@ -83,12 +82,12 @@ class PublishMovieForm(Form):
 class ActorForm(Form):
     name = TextField('actor name', validators=[
         Required(), Length(max=140)])
-    age = TextField('actor name', validators=[
-        Required(), Length(max=140)])
-    type = TextField('actor name', validators=[
-        Required(), Length(max=140)])
     dob = TextField('actor name', validators=[
-        Required(), Length(max=140)])
+        Length(max=140)])
+    biography = TextField('Biography') #, validators=[URL()]
+    imdbId = TextField('imdbId') #, validators=[URL()]
+    birthPlace = TextField('birthPlace') #, validators=[URL()]
+    imageUrl = TextField('imageUrl') #, validators=[URL()]
     submit = SubmitField('YES!')
 
 class AboutMeForm(Form):

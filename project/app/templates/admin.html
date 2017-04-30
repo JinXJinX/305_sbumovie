@@ -29,7 +29,7 @@
   <a href="{{ url_for('edit_movie') }}">
   <button type="button" >Add Movie</button>
   </a>
-  <a href="">
+  <a href="{{ url_for('edit_actor') }}">
   <button type="button" >Add Actor</button>
   </a>
   <hr>
@@ -82,7 +82,9 @@
     <tr>
       <th>ID</th>
       <th>SSN</th>
+      {% if current_user.is_admin_1() %}
       <th>HourlyRate</th>
+      {% endif %}
       <th>AccountId</th>
       <th>Email</th>
       <th>FirstName</th>
@@ -94,7 +96,9 @@
     <tr>
       <td>{{ emp[0].Id }}</td>
       <td>{{ emp[0].SSN }}</td>
+      {% if current_user.is_admin_1() %}
       <td>{{ emp[0].HourlyRate }}</td>
+      {% endif %}
       <td>{{ emp[0].AccountId }}</td>
       <td>{{ emp[1].Email }}</td>
       <td>{{ emp[1].FirstName }}</td>
@@ -152,6 +156,11 @@
           Edit
         </a>
       </td>
+      <td>
+        <a href="{{ url_for("remove", type = 1, id=movie.Id) }}">
+          Delete
+        </a>
+      </td>
     </tr>
     {% endfor %}
   </table>
@@ -171,6 +180,16 @@
       <td>{{ actor.Id}}</td>
       <td>{{ actor.Name}}</td>
       <td>{{ actor.Rating}}</td>
+      <td>
+        <a href="{{ url_for("edit_actor", actor_id=actor.Id) }}">
+          Edit
+        </a>
+      </td>
+      <td>
+        <a href="{{ url_for("remove", type = 2, id=actor.Id) }}">
+          Delete
+        </a>
+      </td>
     </tr>
     {% endfor %}
   </table>

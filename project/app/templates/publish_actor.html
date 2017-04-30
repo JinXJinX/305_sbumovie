@@ -1,9 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="{{ url_for("publish_actor", actor_id=actor.Id }}" method="POST" name="publish">
+{% if actor_id %}
+<form action="{{ url_for("edit_actor", actor_id=actor_id )}}" method="POST" name="publish">
+  {% else %}
+<form action="{{ url_for("edit_actor") }}" method="POST" name="publish_actor">
+  {% endif%}
     {{ form.hidden_tag() }}
-<p>{{ form.body }}</p>
+
+    <p>*Actor Name: {{ form.name }}</p>
+    {% for error in form.errors.name %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>Dob: {{ form.dob}}</p>
+    {% for error in form.errors.dob%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>Biography : {{ form.biography}}</p>
+    {% for error in form.errors.biography%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>Imdb ID: {{ form.imdbId }}</p>
+    {% for error in form.errors.imdbId %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>Birth Place : {{ form.birthPlace}}</p>
+    {% for error in form.errors.birthPlace%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>image url: {{ form.imageUrl}}</p>
+    {% for error in form.errors.imageUrl%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+    
 <p>{{ form.submit }}</p>
 </form>
 {% endblock %}

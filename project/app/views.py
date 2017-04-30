@@ -7,10 +7,9 @@ from flask import (
 from flask_login import (
     login_user, logout_user, current_user, login_required)
 from .forms import (
-    LoginForm, SignUpForm, PublishBlogForm, AboutMeForm, PublishMovieForm)
+    LoginForm, SignUpForm, PublishBlogForm, AboutMeForm, PublishMovieForm, ActorForm)
 from .models import *
-from .utils import PER_PAGE
-from .data import *
+from .utils import *
 from app import app, db, lm
 
 def redirect_back(endpoint, **values):
@@ -127,6 +126,7 @@ def sign_up():
 
     return render_template(
         "profile.html",
+        title='PROFILE',
         action=0,   #sign up
         form=form)
 
@@ -137,7 +137,7 @@ def search():
         movies, actors = dataSearch(query)
         return render_template(
             "list.html",
-            title='Search',
+            title='SEARCH',
             movies=movies,
             actors=actors,
             action=5)
@@ -169,7 +169,7 @@ def movie(movie_id = None):
     rateform = PublishBlogForm()
     return render_template(
         "movie.html",
-        title="Home",
+        title=movie.Name,
         movie=movie,
         movies=movies,
         actors=actors,
@@ -182,7 +182,7 @@ def actor(actor_id = None):
     movies = getMoviesByActorId(actor_id)
     return render_template(
         "actor.html",
-        title="Home",
+        title=actor.Name,
         movies=movies,
         actor=actor)
 
@@ -238,6 +238,7 @@ def profile(user_id = None):
             flash("Saved successful!")
         return render_template(
             "profile.html",
+            title="PROFILE",
             action=1,   #profile
             form=form)
 
@@ -545,11 +546,17 @@ def upgrade(userId, i): # i 0, cusmRep,  i 1 Admin
 def remove(type, id): # type 0 acc, 1 movie, 2 actor
     if type == 0:
         delUser(id)
+        flash("deleted!")
+        return redirect('/admin/1/1')
     elif type == 1:
         delMovie(id)
+        flash("deleted!")
+        return redirect('/admin/4/1')
     elif type == 2:
         delActor(id)
-    flash("deleted!")
+        flash("deleted!")
+        return redirect('/admin/5/1')
+    flash("Error!")
     return redirect('/admin/1/1')
 
 
@@ -586,24 +593,69 @@ def edit_movie(movie_id = None):
             flash("Database error!")
             traceback.print_exc(file=sys.stdout)
             session.rollback()
-            render_template(
-                "edit_movie.html",
-                form=form)
+            return redirect('/')
         print('return pro')
         flash(movie.Name + " is Added!")
         return redirect('/')
     form.name.data = movie.Name
-    form.name.movie_type = movie.Type
-    form.name.copies = movie.NumCopies
-    form.name.posterUrl = movie.ImageUrl
-    form.name.trailerUrl = movie.TrailerUrl
-    form.name.language = movie.Language
-    form.name.length = movie.Length
-    form.name.director = movie.Director
-    form.name.releaseDate = movie.ReleaseDate
-    form.name.imdbId = movie.ImdbId
-    form.name.synopsis = movie.Synopsis
+    form.movie_type.data= movie.Type
+    form.copies.data = movie.NumCopies
+    form.posterUrl.data = movie.ImageUrl
+    form.trailerUrl.data = movie.TrailerUrl
+    form.language.data = movie.Language
+    form.length.data = movie.Length
+    form.director.data = movie.Director
+    form.releaseDate.data = movie.ReleaseDate
+    form.imdbId.data = movie.ImdbId
+    form.synopsis.data = movie.Synopsis
     return render_template(
         "publish_movie.html",
         movie_id=movie_id,
+        form=form)
+
+@app.route('/edit_actor', methods=['GET', 'POST'])
+@app.route('/edit_actor/<int:actor_id>', methods=['GET', 'POST'])
+@login_required
+def edit_actor(actor_id = None):
+    form = ActorForm()
+    session = db.session()
+    if not current_user.is_authenticated() or not current_user.is_admin():
+        return redirect('/')
+    if actor_id:
+        actor = session.query(Actor).filter_by(Id=actor_id).first()
+    else:
+        actor_id = None
+        actor = Actor()
+    if form.validate_on_submit():
+        actor.Name = request.form.get('name')
+        actor.Dob= request.form.get('dob')
+        actor.Biography = request.form.get('biography')
+        actor.ImdbId = request.form.get('imdbId')
+        actor.BirthPlace = request.form.get('birthPlace')
+        actor.ImageUrl = request.form.get('imageUrl')
+        if not actor_id:
+            session.add(actor)
+        try:
+            session.commit()
+        except:
+            flash("Database error!")
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
+            return redirect('/')
+        print('return pro')
+        if not actor_id:
+            flash(actor.Name + " is Added!")
+        else:
+            flash(actor.Name + " is Saved!")
+        return redirect('actor/'+str(actor.Id))
+    form.name.data = actor.Name
+    form.dob.data = actor.Dob
+    form.biography.data = actor.Biography
+    form.birthPlace.data = actor.BirthPlace
+    form.imdbId.data = actor.ImdbId
+    form.imageUrl.data = actor.ImageUrl
+    return render_template(
+        "publish_actor.html",
+        title='ACTOR',
+        actor_id=actor_id,
         form=form)

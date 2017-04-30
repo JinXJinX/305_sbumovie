@@ -168,12 +168,20 @@ def insert_data(page):
             addReviews(movie)
 
 if __name__ == '__main__':
-    page = 1
+    # page = 1
     session = db.session()
-    while page < 10000:
-        insert_data(page)
-        page += 1
-    print('~~~~~~~~~~~~~~Bye~~~~~')
+    # while page < 10000:
+    #     insert_data(page)
+    #     page += 1
+    # print('~~~~~~~~~~~~~~Bye~~~~~')
+
+    actors = session.query(Actor).all()
+    for a in actors:
+        if a.Rating:
+            a.Rating /= 5
+    session.commit()
+
+
     # movies = session.query(Movie).all()
     # size = len(movies)
     # for m in movies:
