@@ -427,7 +427,7 @@ def list(action, query = None, page = None, type = None):
 @app.route('/add/<int:action>/<int:movie_id>', methods=["POST", "GET"])
 def add(action, movie_id):
     session = db.session()
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         user_id = current_user.get_id()
         movie = getMovieById(movie_id)
         if action == 1: # add to OrderId, rent dvd
@@ -484,7 +484,7 @@ def add(action, movie_id):
             else:
                 flash("err to F")
                 redirect('/')
-    return redirect('/')
+    return redirect('sign_in')
 
 @app.route('/admin/<int:action>/<int:i>', methods=["POST", "GET"])
 def admin(action, i):
