@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if emp_id %}
+<form action="{{ url_for("edit_emp", emp_id=emp_id )}}" method="POST" name="publish">
+  {% else %}
+<form action="{{ url_for("edit_emp") }}" method="POST" name="publish_emp">
+  {% endif%}
+    {{ form.hidden_tag() }}
+
+    <p>*SSN : {{ form.ssn }}</p>
+    {% for error in form.errors.ssn %}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>startDate : {{ form.startDate}}</p>
+    {% for error in form.errors.startDate%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>hourlyRate : {{ form.hourlyRate}}</p>
+    {% for error in form.errors.hourlyRate%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+    <p>account : {{ form.accountId}}</p>
+    {% for error in form.errors.accountId%}
+    <p style="color:red;">[-] {{ error }}</p>
+    {% endfor %}
+
+<p>{{ form.submit }}</p>
+</form>
+{% endblock %}

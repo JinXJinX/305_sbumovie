@@ -199,6 +199,11 @@ def profile(user_id = None):
     else:
         account = getAccount(user_id)
 
+    if account.ZipCode:
+        location = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
+    else:
+        location = Location()
+
     #account = getAccount(user_id)
     #account = session.query(Accounts).filter_by(Id=user_id).first()
     if form.validate_on_submit():
@@ -221,6 +226,19 @@ def profile(user_id = None):
         else:
             upType = 1 if request.form.get('account_type') > account.Type else 0
             account.Type = request.form.get('account_type')
+
+        zipcode_check = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
+        if not zipcode_check:
+            newLocation = Location()
+            newLocation.ZipCode = account.ZipCode
+            newLocation.City = request.form.get('city')
+            newLocation.State = request.form.get('state')
+            session.add(newLocation)
+            session.commit()
+        else:
+            zipcode_check.City = request.form.get('city');
+            zipcode_check.State = request.form.get('state');
+
         try:
             db.session.commit()
         except:
@@ -252,6 +270,10 @@ def profile(user_id = None):
     form.phone.data = account.Phone
     form.credit_card.data = account.CreditCardNumber
     form.user_email.data = account.Email
+    form.city.data = location.City
+    form.state.data = location.State
+    if account.ZipCode:
+        localtion =
     return render_template(
         "profile.html",
         form=form)
@@ -666,43 +688,39 @@ def edit_actor(actor_id = None):
 def edit_emp(emp_id = None):
     form = EmpForm()
     session = db.session()
+
     if not current_user.is_authenticated() or not current_user.is_admin():
         return redirect('/')
+
     if emp_id:
         emp = session.query(EmpForm).filter_by(Id=emp_id).first()
     else:
         emp_id = None
         emp = Employee()
-    # if form.validate_on_submit():
-    #     actor.Name = request.form.get('name')
-    #     actor.Dob= request.form.get('dob')
-    #     actor.Biography = request.form.get('biography')
-    #     actor.ImdbId = request.form.get('imdbId')
-    #     actor.BirthPlace = request.form.get('birthPlace')
-    #     actor.ImageUrl = request.form.get('imageUrl')
-    #     if not actor_id:
-    #         session.add(actor)
-    #     try:
-    #         session.commit()
-    #     except:
-    #         flash("Database error!")
-    #         traceback.print_exc(file=sys.stdout)
-    #         session.rollback()
-    #         return redirect('/')
-    #     print('return pro')
-    #     if not actor_id:
-    #         flash(actor.Name + " is Added!")
-    #     else:
-    #         flash(actor.Name + " is Saved!")
-    #     return redirect('actor/'+str(actor.Id))
-    # form.name.data = actor.Name
-    # form.dob.data = actor.Dob
-    # form.biography.data = actor.Biography
-    # form.birthPlace.data = actor.BirthPlace
-    # form.imdbId.data = actor.ImdbId
-    # form.imageUrl.data = actor.ImageUrl
-    # return render_template(
-    #     "publish_actor.html",
-    #     title='ACTOR',
-    #     actor_id=actor_id,
-    #     form=form)
+
+    if form.validate_on_submit():
+        emp.SSN = request.form.get('name')
+        emp.startDate = request.form.get('name')
+        emp.hourlyRate= request.form.get('name')
+        emp.accountId = request.form.get('name')
+        if not actor_id:
+            session.add(emp)
+        try:
+            session.commit()
+        except:
+            flash("Database error!")
+            traceback.print_exc(file=sys.stdout)
+            session.rollback()
+            return redirect('/')
+        print('return pro')
+        flash("Saved!")
+        return redirect('edit_emp/'+str(actor.Id))
+    form.SSN.data = actor.Name
+    form.startDate.data = actor.Dob
+    form.hourlyRate.data = actor.Biography
+    form.accountId.data = actor.BirthPlace
+    return render_template(
+        "edit_emp.html",
+        title='Employee',
+        emp_id=emp_id,
+        form=form)

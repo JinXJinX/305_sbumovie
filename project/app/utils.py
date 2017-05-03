@@ -394,6 +394,10 @@ def upgradeToCustRep(user_id):
     session = db.session()
     account = session.query(Accounts).filter_by(Id = user_id).first()
     account.Type = 'CustRep'
+    emp = Employee()
+    emp.StartDate = datetime.now()
+    emp.AccountId = user_id
+    session.add(emp)
     try:
         session.commit()
     except:
