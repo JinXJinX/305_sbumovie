@@ -445,17 +445,17 @@ def add(action, movie_id):
             redirect('/')
         elif action == 2: # add to MovieQ
             if addMovieQ(user_id, movie_id):
-                flash("is added to Queue")
+                flash(movie.Name + " is added to Queue")
                 redirect('/')
             else:
-                flash("NO added to Queue")
+                flash(movie.Name + " is NOT added to Queue")
                 redirect('/')
         elif action == 3: # add to MovieF
             if addMovieF(user_id, movie_id):
-                flash("is added to F")
+                flash(movie.Name + " is added to F")
                 redirect('/')
             else:
-                flash("NO added to F")
+                flash(movie.Name + " NO added to F")
                 redirect('/')
         elif action == 4: # add reivew
             pass
@@ -659,3 +659,50 @@ def edit_actor(actor_id = None):
         title='ACTOR',
         actor_id=actor_id,
         form=form)
+
+@app.route('/edit_emp', methods=['GET', 'POST'])
+@app.route('/edit_emp/<int:emp_id>', methods=['GET', 'POST'])
+@login_required
+def edit_emp(emp_id = None):
+    form = EmpForm()
+    session = db.session()
+    if not current_user.is_authenticated() or not current_user.is_admin():
+        return redirect('/')
+    if emp_id:
+        emp = session.query(EmpForm).filter_by(Id=emp_id).first()
+    else:
+        emp_id = None
+        emp = Employee()
+    # if form.validate_on_submit():
+    #     actor.Name = request.form.get('name')
+    #     actor.Dob= request.form.get('dob')
+    #     actor.Biography = request.form.get('biography')
+    #     actor.ImdbId = request.form.get('imdbId')
+    #     actor.BirthPlace = request.form.get('birthPlace')
+    #     actor.ImageUrl = request.form.get('imageUrl')
+    #     if not actor_id:
+    #         session.add(actor)
+    #     try:
+    #         session.commit()
+    #     except:
+    #         flash("Database error!")
+    #         traceback.print_exc(file=sys.stdout)
+    #         session.rollback()
+    #         return redirect('/')
+    #     print('return pro')
+    #     if not actor_id:
+    #         flash(actor.Name + " is Added!")
+    #     else:
+    #         flash(actor.Name + " is Saved!")
+    #     return redirect('actor/'+str(actor.Id))
+    # form.name.data = actor.Name
+    # form.dob.data = actor.Dob
+    # form.biography.data = actor.Biography
+    # form.birthPlace.data = actor.BirthPlace
+    # form.imdbId.data = actor.ImdbId
+    # form.imageUrl.data = actor.ImageUrl
+    # return render_template(
+    #     "publish_actor.html",
+    #     title='ACTOR',
+    #     actor_id=actor_id,
+    #     form=form)

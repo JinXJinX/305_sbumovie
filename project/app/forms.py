@@ -94,3 +94,10 @@ class AboutMeForm(Form):
     describe = TextAreaField('about me', validators=[
         Required(), Length(max=140)])
     submit = SubmitField('YES!')
+
+class EmpForm(Form):
+    SSN = IntegerField('SSN', validators=[Required()])
+    startDate = TextField('start date', validators=[Length(max=140)])
+    hourlyRate = IntegerField('houly rate (cent)', validators=[Required()])
+    accountId = IntegerField('account Id', validators=[Required()])
+    submit = SubmitField('SAVE')
