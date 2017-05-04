@@ -552,6 +552,22 @@ def admin(action, i):
                 actors=actors,
                 action=action,
                 page=i)
+        elif action == 6: #most active user
+            accounts = getMostActiveUsers(i)
+            return render_template(
+                "admin.html",
+                title='Active Users',
+                accounts=accounts,
+                action=action,
+                page=i)
+        elif action == 7: #actor list
+            movies = getMostActiveMovies(i)
+            return render_template(
+                "admin.html",
+                title='Active Movies',
+                movies=movies,
+                action=action,
+                page=i)
     return redirect('/')
 
 

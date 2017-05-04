@@ -24,6 +24,11 @@ def getReviews(movieId):
     reviews = session.query(Reviews).filter_by(MovieId=movieId).all()
     return reviews
 
+def getLocation(zipcode):
+    session = db.session()
+    location = session.query(Location).filter_by(ZipCode=zipcode).first()
+    return location
+
 def getReviewById(reviewId):
     session = db.session()
     review = session.query(Reviews).filter_by(Id=reviewId).first()
@@ -299,33 +304,74 @@ def dataSearch(str):
     words = str.split()
     movies = []
     actors = []
-    q = '%' + str + '%'
+    ms = session.query(Movie).filter(Movie.Name == str).all()
+    movies.extend(ms)
+    q =  str
     ms = session.query(Movie).filter(Movie.Name.like(q)).all()
     movies.extend(ms)
-    ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
-    movies.extend(ms)
+    # ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
+    # movies.extend(ms)
     acts = session.query(Actor).filter(Actor.Name.like(q)).all()
     actors.extend(acts)
-    acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
-    actors.extend(acts)
+    # acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
+    # actors.extend(acts)
     for word in words:
         q = '%' + word + '%'
         ms = session.query(Movie).filter(Movie.Name.like(q)).all()
         movies.extend(ms)
-        ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
-        movies.extend(ms)
+        # ms = session.query(Movie).filter(Movie.Synopsis.like(q)).all()
+        # movies.extend(ms)
         acts = session.query(Actor).filter(Actor.Name.like(q)).all()
         actors.extend(acts)
-        acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
-        actors.extend(acts)
+        # acts = session.query(Actor).filter(Actor.Biography.like(q)).all()
+        # actors.extend(acts)
     return list(set(movies))[:20], list(set(actors))[:20]
 
 #Actions for admin user
+def getAddress(user_id):
+    session = db.session()
+    acc = getAccount(user_id)
+    if acc.ZipCode:
+        location = getLocation(acc.ZipCode)
+        return acc.FirstName + ' ' + acc.LastName + '\\n' + \
+                acc.Address + ',\\n' + location.City + ', ' + \
+                location.State + ', ' + str(acc.ZipCode) + '\\nUS'
+    else:
+        return "EMPTY"
+
 def getUsers(page):
     num = 20
     session = db.session()
     accounts = session.query(Accounts).limit(num * page).all()
-    return accounts[num * (page - 1) : (num * page)]
+    accs = accounts[num * (page - 1) : (num * page)]
+    res = []
+    for acc in accs:
+        res.append([acc, getAddress(acc.Id)])
+    return res
+
+def getMostActiveUsers(page):
+    num = 20
+    session = db.session()
+    #userIds = session.query(Orders.AccountId).distinct()
+    qs = session.query(Orders.AccountId, func.count(Orders.AccountId).label('total')).group_by(Orders.AccountId).order_by('total DESC')
+    accounts = []
+    for q in qs:
+        accounts.append(getAccount(q.AccountId))
+    #return accounts[num * (page - 1) : (num * page)]
+    accs = accounts[num * (page - 1) : (num * page)]
+    res = []
+    for acc in accs:
+        res.append([acc, getAddress(acc.Id)])
+    return res
+
+def getMostActiveMovies(page):
+    num = 20
+    session = db.session()
+    qs = session.query(Orders.MovieId, func.count(Orders.MovieId).label('total')).group_by(Orders.MovieId).order_by('total DESC')
+    movies = []
+    for q in qs:
+        movies.append(getMovieById(q.MovieId))
+    return movies[num * (page - 1) : (num * page)]
 
 def delUser(userId):
     session = db.session()
