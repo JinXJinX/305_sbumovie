@@ -105,6 +105,27 @@
       <td>{{ emp[1].LastName }}</td>
       <td>{{ emp[1].Phone }}</td>
       <td>{{ emp[1].Type }}</td>
+      {% if current_user.is_admin_1() %}
+      <td>
+        <a href = "{{ url_for('edit_emp', emp_id=emp[0].Id) }}">
+        <btn > Edit </btn>
+        </a>
+      </td>
+      <td>
+        <a href = "{{ url_for('profile', user_id = emp[0].AccountId) }}">
+        <btn > Profile </btn>
+        </a>
+      </td>
+
+      {% if emp[0].AccountId %}
+      <td>
+        <a href = "{{ url_for('remove', type = 0, id = emp[0].AccountId) }}">
+        <btn > Delete </btn>
+        </a>
+      </td>
+      {% endif %}
+      
+      {% endif %}
     </tr>
     {% endfor %}
   </table>

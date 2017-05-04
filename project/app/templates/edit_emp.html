@@ -8,7 +8,7 @@
   {% endif%}
     {{ form.hidden_tag() }}
 
-    <p>*SSN : {{ form.ssn }}</p>
+    <p>*SSN : {{ form.SSN }}</p>
     {% for error in form.errors.ssn %}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
@@ -18,12 +18,14 @@
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
 
+    {% if current_user.is_admin_1() %}
     <p>hourlyRate : {{ form.hourlyRate}}</p>
     {% for error in form.errors.hourlyRate%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}
+    {% endif %}
 
-    <p>account : {{ form.accountId}}</p>
+    <p>account ID : {{ form.accountId.data}}</p>
     {% for error in form.errors.accountId%}
     <p style="color:red;">[-] {{ error }}</p>
     {% endfor %}

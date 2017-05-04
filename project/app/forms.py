@@ -96,8 +96,8 @@ class AboutMeForm(Form):
     submit = SubmitField('YES!')
 
 class EmpForm(Form):
-    SSN = IntegerField('SSN', validators=[Required()])
+    SSN = IntegerField('SSN')
     startDate = TextField('start date', validators=[Length(max=140)])
-    hourlyRate = IntegerField('houly rate (cent)', validators=[Required()])
+    hourlyRate = IntegerField('houly rate (cent)')
     accountId = IntegerField('account Id', validators=[Required()])
     submit = SubmitField('SAVE')

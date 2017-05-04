@@ -6,8 +6,7 @@ from flask import (
     render_template, flash, redirect, session, url_for, request, g)
 from flask_login import (
     login_user, logout_user, current_user, login_required)
-from .forms import (
-    LoginForm, SignUpForm, PublishBlogForm, AboutMeForm, PublishMovieForm, ActorForm)
+from .forms import *
 from .models import *
 from .utils import *
 from app import app, db, lm
@@ -240,7 +239,7 @@ def profile(user_id = None):
             zipcode_check.State = request.form.get('state');
 
         try:
-            db.session.commit()
+            session.commit()
         except:
             flash("Database error!")
             traceback.print_exc(file=sys.stdout)
@@ -270,10 +269,11 @@ def profile(user_id = None):
     form.phone.data = account.Phone
     form.credit_card.data = account.CreditCardNumber
     form.user_email.data = account.Email
-    form.city.data = location.City
-    form.state.data = location.State
+
     if account.ZipCode:
-        localtion =
+        localtion = session.query(Location).filter_by(ZipCode=account.ZipCode).first()
+        form.city.data = location.City
+        form.state.data = location.State
     return render_template(
         "profile.html",
         form=form)
@@ -693,17 +693,17 @@ def edit_emp(emp_id = None):
         return redirect('/')
 
     if emp_id:
-        emp = session.query(EmpForm).filter_by(Id=emp_id).first()
+        emp = session.query(Employee).filter_by(Id=emp_id).first()
     else:
         emp_id = None
         emp = Employee()
 
     if form.validate_on_submit():
-        emp.SSN = request.form.get('name')
-        emp.startDate = request.form.get('name')
-        emp.hourlyRate= request.form.get('name')
-        emp.accountId = request.form.get('name')
-        if not actor_id:
+        emp.SSN = request.form.get('SSN')
+        emp.StartDate = request.form.get('startDate')
+        emp.HourlyRate= request.form.get('hourlyRate')
+        emp.AccountId = request.form.get('accountId')
+        if not emp_id:
             session.add(emp)
         try:
             session.commit()
@@ -714,11 +714,11 @@ def edit_emp(emp_id = None):
             return redirect('/')
         print('return pro')
         flash("Saved!")
-        return redirect('edit_emp/'+str(actor.Id))
-    form.SSN.data = actor.Name
-    form.startDate.data = actor.Dob
-    form.hourlyRate.data = actor.Biography
-    form.accountId.data = actor.BirthPlace
+        return redirect('edit_emp/'+str(emp.Id))
+    form.SSN.data = emp.SSN
+    form.startDate.data = emp.StartDate
+    form.hourlyRate.data = emp.HourlyRate
+    form.accountId.data = emp.AccountId
     return render_template(
         "edit_emp.html",
         title='Employee',

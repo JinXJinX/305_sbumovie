@@ -330,7 +330,8 @@ def getUsers(page):
 def delUser(userId):
     session = db.session()
     try:
-        session.query(Accounts).filter_by(Id = userId).delete()
+        account = session.query(Accounts).filter_by(Id = userId).first()
+        session.delete(account)
         session.commit()
     except:
         print("Unexpected error:", sys.exc_info()[0])
