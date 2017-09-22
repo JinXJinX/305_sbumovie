@@ -16,7 +16,7 @@ credits = '/credits'
 reviews = '/reviews'
 videos = '/videos'
 person = 'https://api.themoviedb.org/3/person/'
-data = {'api_key' : '82874aa94b97b0e58223d1824ac7a1eb', 'language' : 'en-US'}
+data = {'api_key' : '', 'language' : 'en-US'}
 posterUrl = 'http://image.tmdb.org/t/p/w185'
 trailerUrl = 'https://www.youtube.com/embed/'
 
@@ -145,7 +145,7 @@ def addReviews(movie):
             continue
 
 def insert_data(page):
-    topM = requests.get(topUrl, data = {'api_key' : '82874aa94b97b0e58223d1824ac7a1eb', 'language' : 'en-US', 'page' : page})
+    topM = requests.get(topUrl, data = {'api_key' : '', 'language' : 'en-US', 'page' : page})
 
     if topM.status_code != 200:
         return
